@@ -160,7 +160,7 @@ export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme, lo
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               {/* Search */}
               <div className="reports-search-box">
                 <Search size={14} className="text-white/30" />
@@ -235,7 +235,7 @@ export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme, lo
                 </p>
               </div>
             ) : (
-              <div className="px-8 py-6">
+              <div className="px-4 sm:px-8 py-4 sm:py-6">
                 {Object.entries(groupedByCase).map(([caseId, items]) => (
                   <div key={caseId} className="mb-8">
                     {/* Case header */}

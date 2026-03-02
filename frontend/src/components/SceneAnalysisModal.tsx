@@ -299,9 +299,10 @@ export default function SceneAnalysisModal({
     const container = imageContainerRef.current;
     if (container) {
       const ratio = img.naturalWidth / img.naturalHeight;
-      const maxW = container.clientWidth - 380; // leave room for labels
+      const isMobile = container.clientWidth < 640;
+      const maxW = isMobile ? container.clientWidth - 40 : container.clientWidth - 380; // leave room for labels on desktop
       const maxH = container.clientHeight - 120;
-      let w = Math.min(maxW, 550);
+      let w = Math.min(maxW, isMobile ? container.clientWidth - 32 : 550);
       let h = w / ratio;
       if (h > maxH) {
         h = maxH;

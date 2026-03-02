@@ -638,7 +638,7 @@ export default function Home() {
       {/* Intro Video Overlay */}
       {showIntro && <IntroVideo onComplete={() => setShowIntro(false)} />}
 
-      <main className="relative h-screen overflow-hidden" {...getRootProps()}>
+      <main className="relative h-screen h-[100dvh] overflow-hidden" {...getRootProps()}>
         <input {...getInputProps()} />
 
         {/* ── HOME STATE — Detective Board ── */}
@@ -710,11 +710,11 @@ export default function Home() {
 
             {/* Chat content area */}
             <div
-              className="relative z-10 flex flex-col h-full transition-all duration-300"
+              className="chat-content-area relative z-10 flex flex-col h-full transition-all duration-300"
               style={{ marginLeft: sidebarOpen ? 270 : 0 }}
             >
             {/* Back button — always visible at top of chat */}
-            <div className="flex items-center gap-3 p-10 pb-0">
+            <div className="flex items-center gap-3 p-4 sm:p-6 md:p-10 pb-0">
               <button
                 onClick={() => setActiveChatId(null)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl
@@ -722,7 +722,7 @@ export default function Home() {
                   hover:text-white/80 hover:bg-white/[0.08]
                   transition-all duration-200 text-[13px]"
               >
-                <ArrowLeft size={45} />
+                <ArrowLeft size={20} />
                 <span>Back to Board</span>
               </button>
             </div>
@@ -777,7 +777,7 @@ export default function Home() {
                           Evidence<span className="text-white/35">.AI</span>
                         </h1>
                       </div>
-                      <h2 className="text-3xl font-bold tracking-tight text-white/90">How can I help with the case?</h2>
+                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white/90">How can I help with the case?</h2>
                       <p className="text-white/50 text-[15px] max-w-md mx-auto leading-relaxed">
                         Upload crime scene photos, forensic reports, or ask me to analyze existing suspects.
                       </p>
@@ -801,7 +801,7 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className={`max-w-[75%] space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                      <div className={`max-w-[90%] sm:max-w-[75%] space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                         <div className={`px-4 py-3 rounded-2xl text-[14px] leading-[1.7]
                           ${msg.role === 'user'
                             ? 'msg-bubble-user text-white/90 rounded-br-md'
@@ -974,7 +974,7 @@ export default function Home() {
             )}
 
             {/* Bottom input bar */}
-            <div className="pb-5 px-4">
+            <div className="pb-3 sm:pb-5 px-2 sm:px-4">
               <div className="max-w-3xl mx-auto">
                 <div className="input-bar-glass rounded-2xl p-1.5">
                   <div className="flex items-end gap-2">
@@ -1046,7 +1046,7 @@ export default function Home() {
 
       {/* Evidence Board in chat state — collapsible */}
       {!isHome && (
-        <div className="fixed bottom-24 right-6 z-30">
+        <div className="fixed bottom-24 right-3 sm:right-6 z-30">
           <button
             onClick={() => setShowEvidenceBoard(!showEvidenceBoard)}
             className="evidence-board-toggle"
@@ -1070,8 +1070,8 @@ export default function Home() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-36 right-6 z-20"
-            style={{ width: 480, marginLeft: sidebarOpen ? 270 : 0 }}
+            className="fixed bottom-36 right-3 sm:right-6 z-20 max-w-[calc(100vw-1.5rem)] sm:max-w-[calc(100vw-2rem)]"
+            style={{ width: 480 }}
           >
             <EvidenceBoard3D
               evidence={evidenceItems}

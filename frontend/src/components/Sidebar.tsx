@@ -83,7 +83,7 @@ export default function Sidebar({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -280, opacity: 0 }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="fixed left-0 top-0 bottom-0 z-40 w-[270px] flex flex-col sidebar-glass"
+              className="fixed left-0 top-0 bottom-0 z-40 w-[270px] max-w-[85vw] flex flex-col sidebar-glass"
             >
             {/* Logo + Close */}
             <div className="flex items-center justify-between p-4 pb-3">
