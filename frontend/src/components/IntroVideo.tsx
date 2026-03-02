@@ -10,15 +10,30 @@ interface IntroVideoProps {
 export default function IntroVideo({ onComplete }: IntroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [phase, setPhase] = useState<'playing' | 'exiting' | 'done'>('playing');
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+
+  const triggerExit = () => {
+    if (phaseRef.current === 'playing') {
+      setPhase('exiting');
+    }
+  };
 
   useEffect(() => {
+    // Fallback timeout — if video stalls or never fires onEnded, skip after 8s
+    const timeout = setTimeout(triggerExit, 8000);
+
     // Auto-play on mount
     if (videoRef.current) {
       videoRef.current.play().catch(() => {
-        // If autoplay blocked, skip to site
-        setPhase('exiting');
+        // If autoplay blocked, skip to site immediately
+        clearTimeout(timeout);
+        triggerExit();
       });
     }
+
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleVideoEnd = () => {
@@ -79,6 +94,7 @@ export default function IntroVideo({ onComplete }: IntroVideoProps) {
                   muted
                   playsInline
                   onEnded={handleVideoEnd}
+                  onError={triggerExit}
                   style={{
                     width: '100%',
                     height: '100%',

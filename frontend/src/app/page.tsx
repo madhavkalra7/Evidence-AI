@@ -61,7 +61,13 @@ interface Chat {
 }
 
 export default function Home() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => {
+    // Only show intro if the user hasn't seen it before
+    if (typeof window !== 'undefined') {
+      return !localStorage.getItem('evidenceai_intro_seen');
+    }
+    return true;
+  });
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
@@ -529,7 +535,7 @@ export default function Home() {
   return (
     <>
       {/* Intro Video Overlay */}
-      {showIntro && <IntroVideo onComplete={() => setShowIntro(false)} />}
+      {showIntro && <IntroVideo onComplete={() => { localStorage.setItem('evidenceai_intro_seen', '1'); setShowIntro(false); }} />}
 
       <main className="relative h-screen overflow-hidden" {...getRootProps()}>
         <input {...getInputProps()} />
