@@ -55,16 +55,16 @@
 # ============================================================
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 from config import EMBEDDING_MODEL
 from typing import List, Union
 
 # Load the model once when the module is imported.
-# This is important for performance — loading a model takes seconds,
-# but encoding text takes milliseconds. We don't want to reload every time.
+# fastembed uses ONNX runtime — no PyTorch needed, ~150MB RAM vs ~1.5GB.
 print(f"[EMBEDDING ENGINE] Loading model: {EMBEDDING_MODEL}")
-model = SentenceTransformer(EMBEDDING_MODEL)
-print(f"[EMBEDDING ENGINE] Model loaded. Vector dimension: {model.get_sentence_embedding_dimension()}")
+_fastembed_model_name = "sentence-transformers/all-MiniLM-L6-v2"
+model = TextEmbedding(model_name=_fastembed_model_name)
+print(f"[EMBEDDING ENGINE] Model loaded. Vector dimension: 384")
 
 
 def embed_text(texts: Union[str, List[str]]) -> np.ndarray:
@@ -106,8 +106,8 @@ def embed_text(texts: Union[str, List[str]]) -> np.ndarray:
     if isinstance(texts, str):
         texts = [texts]
 
-    # encode() handles tokenization + transformer + pooling internally
-    embeddings = model.encode(texts, show_progress_bar=False, convert_to_numpy=True)
+    # fastembed.embed() returns a generator — convert to numpy array
+    embeddings = np.array(list(model.embed(texts)))
 
     return embeddings
 
