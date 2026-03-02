@@ -1,42 +1,33 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ShaderAnimation } from '@/components/ui/shader-animation';
 
 interface IntroVideoProps {
   onComplete: () => void;
 }
 
 export default function IntroVideo({ onComplete }: IntroVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [phase, setPhase] = useState<'playing' | 'exiting' | 'done'>('playing');
 
+  // Auto-transition after 3 seconds of shader animation
   useEffect(() => {
-    // Auto-play on mount
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // If autoplay blocked, skip to site
-        setPhase('exiting');
-      });
-    }
+    const timer = setTimeout(() => {
+      setPhase('exiting');
+    }, 3000);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Safety: if the whole intro hasn't completed after 10s, force it
+  // Safety: if the whole intro hasn't completed after 7s, force it
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 10000);
+    }, 7000);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
-  const handleVideoEnd = () => {
-    setPhase('exiting');
-  };
-
   const handleSkip = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-    }
     setPhase('exiting');
   };
 
@@ -75,40 +66,72 @@ export default function IntroVideo({ onComplete }: IntroVideoProps) {
             overflow: 'hidden',
           }}
         >
-          {/* Video layer */}
+          {/* Shader animation layer */}
           <AnimatePresence onExitComplete={() => setPhase('done')}>
             {phase === 'playing' && (
               <motion.div
-                key="video-container"
+                key="shader-container"
                 initial={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.5 }}
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                 }}
               >
-                <video
-                  ref={videoRef}
-                  src="/animation.mp4"
-                  muted
-                  playsInline
-                  onEnded={handleVideoEnd}
+                <ShaderAnimation />
+
+                {/* Evidence AI text overlay */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
+                    position: 'absolute',
+                    inset: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none',
+                    zIndex: 10,
                   }}
-                />
+                >
+                  <span
+                    style={{
+                      fontSize: 'clamp(48px, 8vw, 96px)',
+                      fontWeight: 700,
+                      color: '#fff',
+                      letterSpacing: '-2px',
+                      fontFamily: "'Inter', system-ui, sans-serif",
+                      textShadow: '0 0 40px rgba(100,160,255,0.5), 0 0 80px rgba(100,160,255,0.2)',
+                      lineHeight: 1,
+                    }}
+                  >
+                    Evidence<span style={{ color: 'rgba(255,255,255,0.4)' }}>.AI</span>
+                  </span>
+                  <motion.span
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.8 }}
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: 300,
+                      color: 'rgba(255,255,255,0.5)',
+                      letterSpacing: '4px',
+                      textTransform: 'uppercase',
+                      marginTop: '12px',
+                    }}
+                  >
+                    Forensic Intelligence
+                  </motion.span>
+                </motion.div>
 
                 {/* Skip button */}
                 <motion.button
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 1.5, duration: 0.4 }}
+                  transition={{ delay: 1, duration: 0.4 }}
                   onClick={handleSkip}
                   style={{
                     position: 'absolute',
