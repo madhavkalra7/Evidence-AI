@@ -162,15 +162,17 @@ export default function Home() {
 
   useEffect(() => { fetchStatus(); }, [fetchStatus]);
 
-  // ── Load saved chats from DB on mount ──
+  // ── Load saved chats from DB on mount (with localStorage fallback) ──
   const chatsLoadedFromDB = useRef(false);
   useEffect(() => {
     (async () => {
+      let loaded = false;
+      // Try DB first
       try {
         const res = await fetch('/api/chats');
         if (res.ok) {
           const saved = await res.json();
-          if (saved.length > 0) {
+          if (Array.isArray(saved) && saved.length > 0) {
             setChats(saved.map((c: any) => ({
               id: c.id,
               title: c.title,
@@ -178,24 +180,71 @@ export default function Home() {
               isHypothesisMode: c.isHypothesisMode || false,
               createdAt: new Date(c.createdAt),
             })));
+            loaded = true;
           }
         }
       } catch (e) {
         console.log('[DB] Could not load saved chats:', e);
-      } finally {
-        // Mark loaded so auto-save won't fire on the initial DB load
-        setTimeout(() => { chatsLoadedFromDB.current = true; }, 3000);
       }
+      // Fallback to localStorage
+      if (!loaded) {
+        try {
+          const stored = localStorage.getItem('evidenceai-chats');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setChats(parsed.map((c: any) => ({
+                ...c,
+                createdAt: new Date(c.createdAt),
+              })));
+            }
+          }
+        } catch (e) {
+          console.log('[LS] Could not load saved chats:', e);
+        }
+      }
+      // Also load saved reports from localStorage
+      try {
+        const storedReports = localStorage.getItem('evidenceai-reports');
+        if (storedReports) {
+          const parsed = JSON.parse(storedReports);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSavedReports(parsed);
+          }
+        }
+      } catch (e) {
+        console.log('[LS] Could not load saved reports:', e);
+      }
+      // Mark loaded so auto-save won't fire on the initial load
+      setTimeout(() => { chatsLoadedFromDB.current = true; }, 3000);
     })();
   }, []);
 
-  // ── Auto-save chats to DB (debounced) ──
+  // ── Persist saved reports to localStorage whenever they change ──
+  useEffect(() => {
+    if (savedReports.length === 0) return;
+    if (!chatsLoadedFromDB.current) return;
+    try {
+      localStorage.setItem('evidenceai-reports', JSON.stringify(savedReports));
+    } catch (e) {
+      console.log('[LS] Could not save reports:', e);
+    }
+  }, [savedReports]);
+
+  // ── Auto-save chats to DB + localStorage (debounced) ──
   const saveChatTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (chats.length === 0) return;
     if (!chatsLoadedFromDB.current) return; // Skip save during initial load
     if (saveChatTimeoutRef.current) clearTimeout(saveChatTimeoutRef.current);
     saveChatTimeoutRef.current = setTimeout(async () => {
+      // Always save to localStorage (reliable)
+      try {
+        localStorage.setItem('evidenceai-chats', JSON.stringify(chats));
+      } catch (e) {
+        console.log('[LS] Could not save chats:', e);
+      }
+      // Also try DB save (best-effort)
       for (const chat of chats) {
         try {
           await fetch('/api/chats', {
@@ -209,7 +258,7 @@ export default function Home() {
             }),
           });
         } catch (e) {
-          console.error('[DB] Failed to save chat:', e);
+          // Silently fail — localStorage has the data
         }
       }
     }, 2000);
@@ -244,7 +293,16 @@ export default function Home() {
       const idx = prev.findIndex((r) => r.fileName === fileName);
       if (idx >= 0) {
         const updated = [...prev];
-        updated[idx] = { ...updated[idx], ...localReport, id: updated[idx].id };
+        // Only overwrite fields that have non-null values (preserve existing imageUrl etc.)
+        const merged = { ...updated[idx] };
+        if (localReport.imageUrl) merged.imageUrl = localReport.imageUrl;
+        if (localReport.caption) merged.caption = localReport.caption;
+        if (localReport.analysis) merged.analysis = localReport.analysis;
+        if (localReport.caseId) merged.caseId = localReport.caseId;
+        merged.fileType = localReport.fileType;
+        merged.chunks = localReport.chunks;
+        merged.createdAt = updated[idx].createdAt; // keep original timestamp
+        updated[idx] = merged;
         return updated;
       }
       return [localReport, ...prev];
@@ -515,6 +573,8 @@ export default function Home() {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64Url = reader.result as string;
+            // Update uploadedFiles with base64 URL (so scene modal works reliably)
+            setUploadedFiles((prev) => prev.map((f) => f.id === fileId ? { ...f, imageUrl: base64Url } : f));
             saveReportToDB(file.name, imgType, base64Url, res.caption, res.chunks_created, (res as any).case_id);
           };
           reader.readAsDataURL(file);
