@@ -17,6 +17,7 @@ export interface UploadResponse {
   total_in_store: number;
   caption?: string;
   image_type?: string;
+  text_preview?: string;
 }
 
 export interface ChatResponse {

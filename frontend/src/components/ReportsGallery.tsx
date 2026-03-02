@@ -402,7 +402,7 @@ export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme, lo
             )}
           </div>
 
-          {/* ── PDF DETAIL PANEL ── */}
+          {/* ── DETAIL PANEL (PDF text / Image scene) ── */}
           <AnimatePresence>
             {selectedPdf && (
               <motion.div
@@ -424,92 +424,111 @@ export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme, lo
                     border: '1px solid rgba(255,255,255,0.08)',
                     borderRadius: '20px',
                     width: '90%',
-                    maxWidth: '520px',
-                    padding: '32px',
-                    position: 'relative',
+                    maxWidth: '620px',
+                    maxHeight: '85vh',
+                    display: 'flex',
+                    flexDirection: 'column' as const,
+                    position: 'relative' as const,
                   }}
                 >
-                  {/* Close */}
-                  <button
-                    onClick={() => setSelectedPdf(null)}
-                    style={{
-                      position: 'absolute', top: '16px', right: '16px',
-                      background: 'rgba(255,255,255,0.06)', border: 'none',
-                      borderRadius: '10px', width: '32px', height: '32px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: 'pointer', color: 'rgba(255,255,255,0.4)',
-                    }}
-                  >
-                    <X size={16} />
-                  </button>
+                  {/* Header */}
+                  <div style={{ padding: '24px 32px 16px', flexShrink: 0 }}>
+                    {/* Close */}
+                    <button
+                      onClick={() => setSelectedPdf(null)}
+                      style={{
+                        position: 'absolute', top: '16px', right: '16px',
+                        background: 'rgba(255,255,255,0.06)', border: 'none',
+                        borderRadius: '10px', width: '32px', height: '32px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', color: 'rgba(255,255,255,0.4)',
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
 
-                  {/* PDF Icon */}
-                  <div style={{
-                    width: '72px', height: '72px', borderRadius: '18px',
-                    background: 'rgba(255,68,102,0.1)', border: '1px solid rgba(255,68,102,0.2)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 20px',
-                  }}>
-                    <FileText size={32} style={{ color: '#ff4466' }} />
-                  </div>
-
-                  {/* Title */}
-                  <h3 style={{
-                    color: 'rgba(255,255,255,0.85)', fontSize: '16px', fontWeight: 600,
-                    textAlign: 'center', marginBottom: '4px', wordBreak: 'break-all',
-                  }}>
-                    {selectedPdf.fileName}
-                  </h3>
-                  <p style={{
-                    color: 'rgba(255,255,255,0.3)', fontSize: '11px',
-                    textAlign: 'center', letterSpacing: '1.5px', textTransform: 'uppercase',
-                    marginBottom: '24px',
-                  }}>
-                    PDF Document
-                  </p>
-
-                  {/* Details */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {[
-                      { label: 'Chunks Indexed', value: `${selectedPdf.chunks} chunks` },
-                      { label: 'Case ID', value: selectedPdf.caseId || 'Not assigned' },
-                      { label: 'Uploaded', value: new Date(selectedPdf.createdAt).toLocaleString() },
-                      { label: 'Status', value: selectedPdf.analysis ? 'Analyzed' : 'Indexed' },
-                    ].map(({ label, value }) => (
-                      <div key={label} style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '10px 14px', borderRadius: '10px',
-                        background: 'rgba(255,255,255,0.03)',
-                      }}>
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '12px' }}>{label}</span>
-                        <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', fontWeight: 500 }}>{value}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Caption if available */}
-                  {selectedPdf.caption && (
+                    {/* Icon */}
                     <div style={{
-                      marginTop: '16px', padding: '12px 14px', borderRadius: '10px',
-                      background: 'rgba(255,68,102,0.05)',
-                      border: '1px solid rgba(255,68,102,0.1)',
+                      width: '56px', height: '56px', borderRadius: '14px',
+                      background: 'rgba(255,68,102,0.1)', border: '1px solid rgba(255,68,102,0.2)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      margin: '0 auto 14px',
                     }}>
-                      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                        Summary
-                      </p>
-                      <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', lineHeight: 1.6 }}>
-                        {selectedPdf.caption}
-                      </p>
+                      <FileText size={26} style={{ color: '#ff4466' }} />
                     </div>
-                  )}
 
-                  {/* Tip */}
-                  <p style={{
-                    marginTop: '20px', textAlign: 'center',
-                    color: 'rgba(255,255,255,0.2)', fontSize: '11px',
+                    {/* Title */}
+                    <h3 style={{
+                      color: 'rgba(255,255,255,0.85)', fontSize: '15px', fontWeight: 600,
+                      textAlign: 'center', marginBottom: '4px', wordBreak: 'break-all',
+                    }}>
+                      {selectedPdf.fileName}
+                    </h3>
+                    <p style={{
+                      color: 'rgba(255,255,255,0.3)', fontSize: '11px',
+                      textAlign: 'center', letterSpacing: '1.5px', textTransform: 'uppercase',
+                      marginBottom: '12px',
+                    }}>
+                      PDF Document
+                    </p>
+
+                    {/* Meta row */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' as const }}>
+                      {[
+                        { label: 'Chunks', value: `${selectedPdf.chunks}` },
+                        { label: 'Uploaded', value: new Date(selectedPdf.createdAt).toLocaleDateString() },
+                        { label: 'Case', value: selectedPdf.caseId || 'N/A' },
+                        { label: 'Status', value: selectedPdf.analysis ? 'Analyzed' : 'Indexed' },
+                      ].map(({ label, value }) => (
+                        <div key={label} style={{
+                          padding: '6px 12px', borderRadius: '8px',
+                          background: 'rgba(255,255,255,0.03)',
+                          display: 'flex', gap: '6px', alignItems: 'center',
+                        }}>
+                          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '10px', textTransform: 'uppercase' }}>{label}</span>
+                          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', fontWeight: 500 }}>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Scrollable content area */}
+                  <div style={{
+                    flex: 1, overflow: 'auto', padding: '0 32px 24px',
+                    minHeight: 0,
                   }}>
-                    Ask questions about this document in the chat
-                  </p>
+                    {/* Extracted text / Analysis */}
+                    {(selectedPdf.analysis || selectedPdf.caption) && (
+                      <div style={{
+                        padding: '16px', borderRadius: '12px',
+                        background: 'rgba(255,68,102,0.04)',
+                        border: '1px solid rgba(255,68,102,0.08)',
+                      }}>
+                        <p style={{
+                          color: 'rgba(255,255,255,0.35)', fontSize: '10px', marginBottom: '10px',
+                          textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: 600,
+                        }}>
+                          {selectedPdf.analysis ? 'Extracted Text' : 'Summary'}
+                        </p>
+                        <p style={{
+                          color: 'rgba(255,255,255,0.6)', fontSize: '12px', lineHeight: 1.7,
+                          whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                        }}>
+                          {typeof selectedPdf.analysis === 'string'
+                            ? selectedPdf.analysis
+                            : selectedPdf.caption || ''}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Tip */}
+                    <p style={{
+                      marginTop: '16px', textAlign: 'center',
+                      color: 'rgba(255,255,255,0.2)', fontSize: '11px',
+                    }}>
+                      Ask questions about this document in the chat
+                    </p>
+                  </div>
                 </motion.div>
               </motion.div>
             )}

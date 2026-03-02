@@ -330,7 +330,9 @@ export default function Home() {
       prev.map((c) => {
         if (c.id !== chat!.id) return c;
         const updated = { ...c, messages: [...c.messages, userMsg] };
-        if (c.messages.length === 0) {
+        // Auto-name: on first user message OR if title is still default
+        const isDefaultTitle = c.title === 'New Analysis' || c.title.startsWith('Evidence:');
+        if (c.messages.length === 0 || isDefaultTitle) {
           updated.title = isHypothesis
             ? '🕵️ ' + input.trim().slice(0, 35)
             : input.trim().slice(0, 40);
@@ -450,34 +452,47 @@ export default function Home() {
     setShowUploadMenu(false);
     for (const file of files) {
       const fileId = Date.now().toString() + file.name;
-      const fileType = file.type === 'application/pdf' ? 'pdf' as const : uploadType;
+      // Determine type from MIME (uploadType may still be stale 'pdf' default)
+      const isImageFile = file.type.startsWith('image/');
+      const fileType = file.type === 'application/pdf'
+        ? 'pdf' as const
+        : isImageFile
+          ? (uploadType === 'evidence_image' ? 'evidence_image' : 'scene_image')
+          : uploadType;
       // Create a local object URL for image thumbnail/preview
-      const imageUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined;
+      const imageUrl = isImageFile ? URL.createObjectURL(file) : undefined;
       setUploadedFiles((prev) => [...prev, { id: fileId, name: file.name, type: fileType, chunks: 0, status: 'uploading', imageUrl }]);
       try {
         let res: UploadResponse;
         if (file.type === 'application/pdf') {
           res = await uploadPDF(file);
         } else {
-          res = await uploadImage(file, uploadType);
+          // Send the corrected fileType, not the potentially-stale uploadType
+          res = await uploadImage(file, fileType);
         }
         setUploadedFiles((prev) => prev.map((f) => f.id === fileId ? { ...f, chunks: res.chunks_created, status: 'done' as const, caption: res.caption } : f));
         fetchStatus();
 
         // Auto-inject upload confirmation into active chat
-        const isImage = file.type.startsWith('image/');
         const uploadMsg: Message = {
           id: (Date.now() + 2).toString(),
           role: 'assistant',
-          content: !isImage
+          content: !isImageFile
             ? `📄 **Evidence Uploaded:** \`${file.name}\`\n\n- **Pages Extracted:** ${res.pages_extracted || 'N/A'}\n- **Chunks Created:** ${res.chunks_created}\n\n_You can now ask questions about this document._`
-            : `🖼️ **Evidence Uploaded:** \`${file.name}\`\n\n**${res.image_type === 'scene_image' ? 'Crime Scene Photo' : 'Evidence Photo'}** — ${res.chunks_created} chunks indexed\n\n${res.caption ? `> ${res.caption.slice(0, 150).trim()}…` : ''}\n\n_Click **Open Scene** to view full forensic analysis._`,
+            : `🖼️ **Evidence Uploaded:** \`${file.name}\`\n\n**${fileType === 'scene_image' ? 'Crime Scene Photo' : 'Evidence Photo'}** — ${res.chunks_created} chunks indexed\n\n${res.caption ? `> ${res.caption.slice(0, 150).trim()}…` : ''}\n\n_Click **Open Scene** to view full forensic analysis._`,
         };
 
         setChats((prev) => {
           const currentId = activeChatId;
           if (currentId) {
-            return prev.map((c) => c.id === currentId ? { ...c, messages: [...c.messages, uploadMsg] } : c);
+            return prev.map((c) => {
+              if (c.id !== currentId) return c;
+              // Also update title if still default
+              const newTitle = (c.title === 'New Analysis')
+                ? `Evidence: ${file.name.slice(0, 30)}`
+                : c.title;
+              return { ...c, title: newTitle, messages: [...c.messages, uploadMsg] };
+            });
           }
           const newChat: Chat = {
             id: Date.now().toString(),
@@ -490,8 +505,8 @@ export default function Home() {
         });
 
         // Auto-trigger scene analysis for images (fire-and-forget)
-        if (isImage) {
-          const imgType = (res.image_type || uploadType) as 'scene_image' | 'evidence_image';
+        if (isImageFile) {
+          const imgType = (fileType === 'scene_image' || fileType === 'evidence_image') ? fileType : 'scene_image' as const;
           const caption = res.caption || `Forensic ${imgType === 'scene_image' ? 'crime scene' : 'evidence'} image: ${res.filename}`;
           console.log('[Scene] Auto-triggering analysis for:', res.filename, 'caption length:', caption.length);
           setAnalyzingFiles((prev) => ({ ...prev, [file.name]: true }));
@@ -518,8 +533,10 @@ export default function Home() {
               setAnalyzingFiles((prev) => ({ ...prev, [file.name]: false }));
             });
         } else {
-          // Save PDF report to DB
-          saveReportToDB(file.name, 'pdf', undefined, undefined, res.chunks_created, (res as any).case_id);
+          // Save PDF report to DB — include extracted text as analysis
+          const pdfCaption = `PDF Document — ${res.pages_extracted || '?'} pages extracted, ${res.chunks_created} chunks indexed.`;
+          const pdfAnalysis = res.text_preview || null;
+          saveReportToDB(file.name, 'pdf', undefined, pdfCaption, res.chunks_created, (res as any).case_id, pdfAnalysis);
         }
       } catch {
         setUploadedFiles((prev) => prev.map((f) => f.id === fileId ? { ...f, status: 'error' as const } : f));

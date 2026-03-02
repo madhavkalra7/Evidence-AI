@@ -308,7 +308,8 @@ async def upload_pdf(
         "total_in_store": vector_store.total_chunks,
         "case_id": case_id,
         "is_new_case": is_new_case,
-        "case_description": case_description
+        "case_description": case_description,
+        "text_preview": full_text[:8000] if full_text else ""
     }
 
 
