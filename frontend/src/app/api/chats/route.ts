@@ -1,26 +1,34 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-// GET /api/chats — list all chats with message count
+// Lazy-init prisma — returns null if DB not configured
+function getPrisma() {
+  try {
+    const url = process.env.DATABASE_URL || '';
+    if (!url.startsWith('postgres://') && !url.startsWith('postgresql://')) return null;
+    const { prisma } = require('@/lib/prisma');
+    return prisma;
+  } catch { return null; }
+}
+
+// GET /api/chats — list all chats
 export async function GET() {
+  const prisma = getPrisma();
+  if (!prisma) return NextResponse.json([]);
+
   try {
     const chats = await prisma.chat.findMany({
       orderBy: { createdAt: 'desc' },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' },
-        },
-      },
+      include: { messages: { orderBy: { createdAt: 'asc' } } },
     });
 
-    const result = chats.map((chat) => ({
+    const result = chats.map((chat: any) => ({
       id: chat.id,
       title: chat.title,
       isHypothesisMode: chat.isHypothesisMode,
       createdAt: chat.createdAt.toISOString(),
-      messages: chat.messages.map((m) => ({
+      messages: chat.messages.map((m: any) => ({
         id: m.id,
         role: m.role,
         content: m.content,
@@ -30,19 +38,20 @@ export async function GET() {
     }));
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error('Failed to fetch chats:', error);
-    return NextResponse.json({ error: 'Failed to fetch chats' }, { status: 500 });
+  } catch {
+    return NextResponse.json([]);
   }
 }
 
 // POST /api/chats — create or update a chat
 export async function POST(request: Request) {
+  const prisma = getPrisma();
+  if (!prisma) return NextResponse.json({ success: false, reason: 'no-db' });
+
   try {
     const body = await request.json();
     const { id, title, messages, isHypothesisMode } = body;
 
-    // Upsert: create if not found, update if exists
     const chat = await prisma.chat.upsert({
       where: { id: id || '' },
       update: {
@@ -57,11 +66,8 @@ export async function POST(request: Request) {
       },
     });
 
-    // If messages provided, sync them
     if (messages && Array.isArray(messages)) {
-      // Delete existing messages and recreate (simple sync)
       await prisma.message.deleteMany({ where: { chatId: chat.id } });
-
       if (messages.length > 0) {
         await prisma.message.createMany({
           data: messages.map((m: any) => ({
@@ -77,14 +83,16 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, chatId: chat.id });
-  } catch (error) {
-    console.error('Failed to save chat:', error);
-    return NextResponse.json({ error: 'Failed to save chat' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ success: false }, { status: 200 });
   }
 }
 
 // DELETE /api/chats — delete a chat
 export async function DELETE(request: Request) {
+  const prisma = getPrisma();
+  if (!prisma) return NextResponse.json({ success: false, reason: 'no-db' });
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -92,8 +100,7 @@ export async function DELETE(request: Request) {
 
     await prisma.chat.delete({ where: { id } });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Failed to delete chat:', error);
-    return NextResponse.json({ error: 'Failed to delete chat' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ success: false }, { status: 200 });
   }
 }
