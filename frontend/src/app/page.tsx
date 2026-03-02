@@ -78,6 +78,7 @@ export default function Home() {
   const [selectedEvidence, setSelectedEvidence] = useState<EvidenceItem | null>(null);
   const [showReportsGallery, setShowReportsGallery] = useState(false);
   const [showBlast, setShowBlast] = useState(false);
+  const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
 
   // Scene Analysis Modal state
   const [sceneModalOpen, setSceneModalOpen] = useState(false);
@@ -225,6 +226,31 @@ export default function Home() {
     caseId: string | undefined,
     analysis?: any
   ) => {
+    // Save to in-memory state (always works, even without DB)
+    const localReport: SavedReport = {
+      id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      fileName,
+      fileType,
+      imageUrl: imageUrl || null,
+      thumbnailUrl: null,
+      caption: caption || null,
+      chunks,
+      caseId: caseId || null,
+      analysis: analysis || null,
+      createdAt: new Date().toISOString(),
+    };
+    setSavedReports((prev) => {
+      // Update existing by fileName, or add new
+      const idx = prev.findIndex((r) => r.fileName === fileName);
+      if (idx >= 0) {
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], ...localReport, id: updated[idx].id };
+        return updated;
+      }
+      return [localReport, ...prev];
+    });
+
+    // Also try DB save (best-effort)
     try {
       await fetch('/api/reports', {
         method: 'POST',
@@ -284,6 +310,10 @@ export default function Home() {
     if (activeChatId === id) setActiveChatId(null);
     // Delete from DB
     fetch(`/api/chats?id=${id}`, { method: 'DELETE' }).catch(() => {});
+  };
+
+  const handleRenameSession = (id: string, newTitle: string) => {
+    setChats((prev) => prev.map((c) => c.id === id ? { ...c, title: newTitle } : c));
   };
 
   // ── Send message ──
@@ -573,6 +603,7 @@ export default function Home() {
               onNewChat={handleNewChat}
               onSelectSession={handleSelectSession}
               onDeleteSession={handleDeleteSession}
+              onRenameSession={handleRenameSession}
               isOpen={sidebarOpen}
               onToggle={() => setSidebarOpen(!sidebarOpen)}
               onGoHome={() => setActiveChatId(null)}
@@ -594,6 +625,7 @@ export default function Home() {
               onNewChat={handleNewChat}
               onSelectSession={handleSelectSession}
               onDeleteSession={handleDeleteSession}
+              onRenameSession={handleRenameSession}
               isOpen={sidebarOpen}
               onToggle={() => setSidebarOpen(!sidebarOpen)}
               onGoHome={() => setActiveChatId(null)}
@@ -995,6 +1027,7 @@ export default function Home() {
       <ReportsGallery
         isOpen={showReportsGallery}
         onClose={() => setShowReportsGallery(false)}
+        localReports={savedReports}
         onOpenScene={(report: SavedReport) => {
           // Only open scene modal for images, not PDFs
           if (report.fileType === 'pdf') return;

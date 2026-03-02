@@ -9,6 +9,8 @@ import {
   PanelLeftClose,
   PanelLeft,
   Fingerprint,
+  Pencil,
+  Check,
 } from 'lucide-react';
 
 /* ============================================================
@@ -28,6 +30,7 @@ interface SidebarProps {
   onNewChat: () => void;
   onSelectSession: (id: string) => void;
   onDeleteSession: (id: string) => void;
+  onRenameSession?: (id: string, newTitle: string) => void;
   isOpen: boolean;
   onToggle: () => void;
   onGoHome?: () => void;
@@ -39,11 +42,14 @@ export default function Sidebar({
   onNewChat,
   onSelectSession,
   onDeleteSession,
+  onRenameSession,
   isOpen,
   onToggle,
   onGoHome,
 }: SidebarProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
 
   return (
     <>
@@ -133,6 +139,7 @@ export default function Sidebar({
               {sessions.map((session) => {
                 const isActive = session.id === activeSessionId;
                 const isHovered = session.id === hoveredId;
+                const isEditing = session.id === editingId;
 
                 return (
                   <motion.div
@@ -141,7 +148,7 @@ export default function Sidebar({
                     animate={{ opacity: 1, x: 0 }}
                     onMouseEnter={() => setHoveredId(session.id)}
                     onMouseLeave={() => setHoveredId(null)}
-                    onClick={() => onSelectSession(session.id)}
+                    onClick={() => { if (!isEditing) onSelectSession(session.id); }}
                     className={`group relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer
                       transition-all duration-200
                       ${isActive
@@ -150,20 +157,77 @@ export default function Sidebar({
                       }`}
                   >
                     <MessageSquare size={14} className="flex-shrink-0 opacity-50" />
-                    <span className="flex-1 text-[13px] truncate">{session.title}</span>
                     
-                    {/* Delete button */}
-                    {(isHovered || isActive) && (
+                    {isEditing ? (
+                      <input
+                        autoFocus
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const trimmed = editTitle.trim();
+                            if (trimmed && onRenameSession) onRenameSession(session.id, trimmed);
+                            setEditingId(null);
+                          }
+                          if (e.key === 'Escape') setEditingId(null);
+                        }}
+                        onBlur={() => {
+                          const trimmed = editTitle.trim();
+                          if (trimmed && onRenameSession) onRenameSession(session.id, trimmed);
+                          setEditingId(null);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex-1 bg-white/10 text-white/90 text-[13px] px-1.5 py-0.5 rounded-md
+                          outline-none border border-white/20 focus:border-white/40"
+                      />
+                    ) : (
+                      <span className="flex-1 text-[13px] truncate">{session.title}</span>
+                    )}
+                    
+                    {/* Action buttons */}
+                    {(isHovered || isActive) && !isEditing && (
+                      <div className="flex items-center gap-0.5">
+                        {/* Rename button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingId(session.id);
+                            setEditTitle(session.title);
+                          }}
+                          className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center
+                            text-white/20 hover:text-blue-400 hover:bg-blue-500/10
+                            transition-all duration-200"
+                        >
+                          <Pencil size={11} />
+                        </button>
+                        {/* Delete button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteSession(session.id);
+                          }}
+                          className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center
+                            text-white/20 hover:text-red-400 hover:bg-red-500/10
+                            transition-all duration-200"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    )}
+
+                    {isEditing && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onDeleteSession(session.id);
+                          const trimmed = editTitle.trim();
+                          if (trimmed && onRenameSession) onRenameSession(session.id, trimmed);
+                          setEditingId(null);
                         }}
                         className="flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center
-                          text-white/20 hover:text-red-400 hover:bg-red-500/10
+                          text-emerald-400 hover:bg-emerald-500/10
                           transition-all duration-200"
                       >
-                        <Trash2 size={12} />
+                        <Check size={13} />
                       </button>
                     )}
                   </motion.div>

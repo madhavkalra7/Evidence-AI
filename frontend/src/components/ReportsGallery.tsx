@@ -43,10 +43,11 @@ interface ReportsGalleryProps {
   onClose: () => void;
   onOpenScene: (report: SavedReport) => void;
   theme: 'light' | 'dark';
+  localReports?: SavedReport[];
 }
 
-export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme }: ReportsGalleryProps) {
-  const [reports, setReports] = useState<SavedReport[]>([]);
+export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme, localReports = [] }: ReportsGalleryProps) {
+  const [dbReports, setDbReports] = useState<SavedReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'scene_image' | 'evidence_image' | 'pdf'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,14 +55,14 @@ export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme }: 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedPdf, setSelectedPdf] = useState<SavedReport | null>(null);
 
-  // ── Fetch reports ──
+  // ── Fetch reports from DB, merge with in-memory local reports ──
   const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/reports');
       if (res.ok) {
         const data = await res.json();
-        setReports(data);
+        if (Array.isArray(data)) setDbReports(data);
       }
     } catch (err) {
       console.error('Failed to fetch reports:', err);
@@ -74,12 +75,22 @@ export default function ReportsGallery({ isOpen, onClose, onOpenScene, theme }: 
     if (isOpen) fetchReports();
   }, [isOpen, fetchReports]);
 
+  // Merge DB + local reports, dedup by fileName
+  const reports = useMemo(() => {
+    const map = new Map<string, SavedReport>();
+    for (const r of localReports) map.set(r.fileName, r);
+    for (const r of dbReports) map.set(r.fileName, r); // DB wins on conflict
+    return Array.from(map.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [dbReports, localReports]);
+
   // ── Delete report ──
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
       await fetch(`/api/reports?id=${id}`, { method: 'DELETE' });
-      setReports((prev) => prev.filter((r) => r.id !== id));
+      setDbReports((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
       console.error('Failed to delete report:', err);
     }
