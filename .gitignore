@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.env.local
+
+# Build
+.next/
+out/
+dist/
+build/
+
+# FAISS store
+faiss_store/
+
+# ChromaDB vector store (large binary files)
+chroma_store/
+
+# Uploads
+uploads/
+
+# SQLite databases
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp files
+temp.*
+*.tmp

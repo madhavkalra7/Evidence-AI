@@ -1,0 +1,77 @@
+FORENSIC INCIDENT REPORT
+Case Number: FR-2025-04821
+Date of Report: February 18, 2026
+Reporting Officer: Detective Sarah Mitchell, Badge #4417
+Department: Metro City Police Department — Forensic Division
+
+INCIDENT SUMMARY
+
+On February 17, 2026, at approximately 10:45 PM, officers from the Metro City Police Department responded to a residential burglary report at 742 Evergreen Terrace, Apartment 3B, Metro City. The complainant, Mr. James Rodriguez (age 34), reported hearing suspicious sounds followed by a loud crash originating from his living room while he was in the bedroom.
+
+SCENE DESCRIPTION
+
+Upon arrival at 11:02 PM, officers observed the following:
+
+1. ENTRY POINT: The front door of Apartment 3B showed signs of forced entry. The door frame was splintered near the deadbolt lock, consistent with a pry-bar or similar levering tool. No tool marks were recovered from the scene suitable for comparison analysis.
+
+2. LIVING ROOM: The main living area was in a state of disarray. A glass coffee table had been shattered, with fragments scattered across approximately a 6-foot radius. A floor lamp had been knocked over. The television (55-inch Samsung, Model QN55Q80C) had been removed from its wall mount. Mount brackets remained attached to the wall with visible stress marks.
+
+3. KITCHEN: A kitchen knife (8-inch chef's knife, Wüsthof brand) was found on the living room floor near the hallway entrance. The knife appeared to belong to a knife block set located on the kitchen counter. One slot in the block was empty, matching the recovered knife. No blood traces were observed on the blade. The knife may have been grabbed by the intruder or displaced during the altercation.
+
+4. BEDROOM: A jewelry box on the master bedroom dresser was found open and empty. Mr. Rodriguez confirmed the box previously contained a gold chain (estimated value $1,200), a pair of diamond earrings (estimated value $3,500), and a vintage Omega Seamaster watch (estimated value $8,000).
+
+EVIDENCE COLLECTED
+
+- Item 1: Partial fingerprint lifted from the broken door frame (sent to forensics lab)
+- Item 2: Shoe impression near the entry point (photographed, appears to be size 10 athletic shoe)
+- Item 3: Kitchen knife recovered from living room floor (bagged and tagged)
+- Item 4: Glass fragments from coffee table (sampled for trace evidence)
+- Item 5: Fiber sample recovered from broken door frame (dark blue cotton fiber)
+- Item 6: Security camera footage from building lobby (timestamp 10:38 PM shows individual in dark hoodie and jeans entering)
+
+WITNESS STATEMENTS
+
+Mrs. Patricia Wong (Apartment 3A, adjacent unit): Stated she heard a loud bang at approximately 10:40 PM, followed by sounds of objects falling. She did not observe any individuals entering or leaving Apartment 3B. Mrs. Wong called building security at 10:43 PM.
+
+Mr. David Kim (Building Security Guard): Confirmed receiving a disturbance call from Mrs. Wong at 10:43 PM. He proceeded to the third floor, arriving at approximately 10:50 PM. He observed the damaged door of Apartment 3B and immediately contacted the police. He reports that the building's rear exit door was propped open with a brick, which is unusual.
+
+FORENSIC OBSERVATIONS
+
+The pattern of the forced entry suggests a single point of leverage applied to the door frame near the deadbolt. The splintering pattern is consistent with rapid, forceful entry rather than prolonged manipulation, suggesting the intruder prioritized speed over stealth.
+
+The shattered coffee table and overturned lamp suggest a physical confrontation or hurried movement through the space. However, Mr. Rodriguez states he did not engage with the intruder and only observed a shadowy figure retreating from the living room when he emerged from the bedroom.
+
+The building security footage shows a single individual entering the lobby at 10:38 PM. The individual is wearing a dark hoodie, dark jeans, and light-colored athletic shoes. They appear to be carrying a backpack. Facial features are not clearly visible due to the hoodie and camera angle. The individual was not observed on camera leaving through the lobby, supporting the theory that exit was made through the propped-open rear door.
+
+TIME DISCREPANCY NOTE: Mr. Rodriguez initially stated the incident occurred at "around 10:45 PM." Mrs. Wong reported the loud bang at approximately 10:40 PM. Security footage shows lobby entry at 10:38 PM. Considering the 2-minute transit from lobby to third floor, the timeline is consistent: entry at 10:38 PM, arrival at apartment by 10:40 PM, forced entry causing the loud bang heard by Mrs. Wong.
+
+ESTIMATED LOSSES
+
+- Samsung 55-inch Television: $1,200
+- Gold chain: $1,200
+- Diamond earrings: $3,500  
+- Omega Seamaster watch: $8,000
+- Coffee table (damaged): $450
+- Door frame repair: $350
+Total estimated loss: $14,700
+
+CURRENT STATUS
+
+- Fingerprint analysis: Pending (estimated 5-7 business days)
+- Security footage has been preserved and forwarded to digital forensics for enhancement
+- Shoe impression comparison pending
+- Fiber analysis pending
+- Case classified as: Residential Burglary — Active Investigation
+- No suspects identified at this time
+
+OFFICER NOTES
+
+The method of entry (forced door) and exit (propped rear door) suggest premeditation and familiarity with the building layout. The targeted removal of high-value items (electronics, jewelry, watch) while ignoring other valuables (laptop on desk, cash in kitchen drawer) may indicate the intruder had prior knowledge of the apartment contents.
+
+Recommend canvassing additional security cameras in neighboring buildings and conducting interviews with building residents regarding any unfamiliar visitors in the days preceding the incident.
+
+Report prepared by:
+Detective Sarah Mitchell
+Badge #4417
+Metro City Police Department
+Forensic Investigation Division

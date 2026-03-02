@@ -1,0 +1,416 @@
+[
+  {
+    "timestamp": "2026-02-24T10:30:07.000112",
+    "question": "summarize this report",
+    "answer_preview": "**📋 Case Overview**\nThe case ID is FR-017-2026, and the incident occurred on February 14, 2026, at 221B West Ridge Apartments, Sector 9, as reported by Inspector A. Mehra [Source 2]. The complainant, Mr. Rohan Malhotra, reported a break-in at his apartment.\n\n**🔍 Incident Details**\nThe incident appea...",
+    "answer_length": 1834,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 2,
+    "retrieval_relevance": 1.1678,
+    "grounding_score": 0.9375,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.0406509637832642,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.2949271202087402,
+        "type": "pdf",
+        "page": 1
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-24T10:31:36.918839",
+    "question": "tell me a joke",
+    "answer_preview": "**📋 Case Overview**\nThe case ID is FR-017-2026, and the incident occurred on 14 February 2026, at 221B West Ridge Apartments, Sector 9 [Source 1]. The reporting officer is Inspector A. Mehra.\n\n**🔍 Incident Details**\nThe incident involved a break-in at the above address, with forced entry through the...",
+    "answer_length": 1977,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 2,
+    "retrieval_relevance": 1.2751,
+    "grounding_score": 0.8125,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.2597346305847168,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.2904820442199707,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-24T10:31:50.575973",
+    "question": "tell me a joke",
+    "answer_preview": "I must refuse the request to tell a joke as it is not relevant to the forensic analysis of the case. The <UserQuery> tag is for requesting information related to the case, and I will only provide answers based on the information found in the <RetrievedContext> tag.\n\nIf you would like to request a su...",
+    "answer_length": 1439,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 2,
+    "retrieval_relevance": 1.2578,
+    "grounding_score": 0.6,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.2572765350341797,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.2584140300750732,
+        "type": "pdf",
+        "page": 1
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-24T10:41:21.186596",
+    "question": "tell me a joke",
+    "answer_preview": "I must refuse the request to tell a joke as it is not relevant to the forensic analysis of the case. The <UserQuery> tag is for requesting information related to the case, not for sharing unrelated content.\n\nTo provide a comprehensive summary of the case, I will follow the forensic report structure:...",
+    "answer_length": 1918,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 2,
+    "retrieval_relevance": 1.2634,
+    "grounding_score": 0.8,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.2604081630706787,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.266342043876648,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-24T10:50:27.538346",
+    "question": "What evidence was found at the scene?",
+    "answer_preview": "**📋 Case Overview** \n- Case ID: FR-017-2026 [Source 2]\n- Date: 14 February 2026 [Source 2]\n- Location: 221B West Ridge Apartments, Sector 9 [Source 2]\n- Personnel: Inspector A. Mehra (Reporting Officer) [Source 2], Mr. Rohan Malhotra (Complainant) [Source 2]\n\n**🔍 Incident Details** \n- The incident w...",
+    "answer_length": 2214,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 3,
+    "retrieval_relevance": 0.8213,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.6824384927749634,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.8730596899986267,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be a living room or a similar domestic",
+        "score": 0.9083429574966431,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-25T15:49:23.963592",
+    "question": "summarize his report",
+    "answer_preview": "**📋 Case Overview**\nThe case ID is FR-017-2026, and it occurred on 14 February 2026, at 221B West Ridge Apartments, Sector 9 [Source 2]. The reporting officer is Inspector A. Mehra. The complainant, Mr. Rohan Malhotra, reported a break-in at his apartment.\n\n**🔍 Incident Details**\nThe incident appear...",
+    "answer_length": 2003,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 2,
+    "retrieval_relevance": 1.2012,
+    "grounding_score": 0.8947,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.1643238067626953,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.238149642944336,
+        "type": "pdf",
+        "page": 1
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-25T19:48:09.212798",
+    "question": "Describe the timeline of events",
+    "answer_preview": "**📋 Case Overview**\nThe scene is a domestic setting, possibly a living room, with dim lighting conditions, suggesting nighttime or poor lighting [Source 1]. The general state of the room is one of disarray and potential violence.\n\n**🔍 Incident Details**\nThe exact timeline of events is not explicitly...",
+    "answer_length": 1928,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 1.2722,
+    "grounding_score": 0.8667,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Crime Scene Image Analysis]\n## **Forensic Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be a living room or a similar domestic setti",
+        "score": 1.27222740650177,
+        "type": "scene_image",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-25T19:51:01.777000",
+    "question": "give the timings for this incident",
+    "answer_preview": "**Incident Timings**\nThe incident occurred at approximately 21:40 hours on 14 February 2026, according to [Source 1]. This is the only timing information available for the incident. \n\nNo other specific timings are mentioned in the provided evidence. If more detailed information is required, addition...",
+    "answer_length": 443,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.9407,
+    "grounding_score": 0.2,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.940705418586731,
+        "type": "pdf",
+        "page": 1
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-26T11:05:33.977504",
+    "question": "What evidence was found at the scene?",
+    "answer_preview": "**📋 Case Overview** \nThe scene is a living room or similar domestic setting, with evidence suggesting a violent incident may have occurred.\n\n**🔍 Incident Details** \nA knife, broken glass, and potential blood or bodily fluids were found at the scene, indicating a possible altercation. The window on t...",
+    "answer_length": 1814,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.9911,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be a living room or a similar domestic",
+        "score": 0.9910902976989746,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-26T11:16:35.478454",
+    "question": "what was the evidence found at this scene",
+    "answer_preview": "**📋 Case Overview**\nThe scene is set in a residential study or living room, with a body found on the floor covered by a sheet, indicating a potential homicide or suspicious death.\n\n**🔍 Incident Details**\nThe room is dimly lit, with a single light source coming from a lamp on a side table. The genera...",
+    "answer_length": 1864,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.9802,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Crime Scene Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be set in a study or a liv",
+        "score": 0.98016357421875,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-26T11:46:36.112638",
+    "question": "What evidence was found at the scene?",
+    "answer_preview": "**📦 Evidence Collected**\nThe scene analysis report, as per [Source 1], indicates the presence of several items that could be considered as evidence. These include:\n\n1. A glass tumbler containing a brown liquid, found on the floor near the body.\n2. A playing card, located on the floor near the glass ...",
+    "answer_length": 1146,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.9777,
+    "grounding_score": 0.9231,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Crime Scene Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be set in a study or a liv",
+        "score": 0.9777401685714722,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-26T11:48:19.525839",
+    "question": "What evidence was found at the scene?",
+    "answer_preview": "**📋 Case Overview** \nThe scene is a living room in a residential setting, with the incident involving a broken window and potential violent confrontation.\n\n**🔍 Incident Details** \nThe window is severely damaged with large, jagged shards of glass missing, indicating a forceful break-in or exit. A lar...",
+    "answer_length": 1763,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.9556,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be a living room in a residential sett",
+        "score": 0.9555701017379761,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-26T11:48:43.988234",
+    "question": "are the report and scene same?",
+    "answer_preview": "**📋 Case Overview**\nThe incident report [Source 2] provides details about the case, including the case ID (FR-017-2026), date (14 February 2026), location (221B West Ridge Apartments, Sector 9), and reporting officer (Inspector A. Mehra).\n\n**🔍 Incident Details**\nAccording to [Source 2], the incident...",
+    "answer_length": 2090,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 2,
+    "retrieval_relevance": 0.9392,
+    "grounding_score": 0.9286,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.8319563865661621,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.046484112739563,
+        "type": "pdf",
+        "page": 1
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-28T20:17:46.422552",
+    "question": "summarize this report",
+    "answer_preview": "**📋 Case Overview**\nThe incident report is for Case ID: FR-017-2026, which occurred on 14 February 2026, at 221B West Ridge Apartments, Sector 9. The reporting officer is Inspector A. Mehra [Source 1].\n\n**🔍 Incident Details**\nThe incident involved a break-in at the apartment, with forced entry throu...",
+    "answer_length": 1793,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 2,
+    "retrieval_relevance": 0.9606,
+    "grounding_score": 0.9412,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.9604343175888062,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.9606813788414001,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-28T20:18:53.921368",
+    "question": "kya ye report or scene image same hain?",
+    "answer_preview": "**📋 Case Overview** — The scene depicted appears to be a living room in a residential setting, likely an apartment given the presence of a balcony outside the broken window, as observed in the physical evidence image analysis [Source 1].\n\n**🔍 Incident Details** — The room is dimly lit, with light pr...",
+    "answer_length": 1663,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.8918,
+    "grounding_score": 0.9091,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Analysis Report: Crime Scene Overview**\n\n### **Scene Overview**\nThe scene depicted appears to be a li",
+        "score": 0.8918380737304688,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-28T20:33:01.080287",
+    "question": "kya ye image scene or report same incidence hain?",
+    "answer_preview": "According to the information provided in the forensic analysis report, it appears that the image and the report are describing the same incident. The report details a living room scene with a broken window, scattered glass shards, and a kitchen knife on the floor, which suggests a possible break-in ...",
+    "answer_length": 1126,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.7665,
+    "grounding_score": 0.8571,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Analysis Report: Crime Scene Overview**\n\n### **Scene Overview**\nThe scene depicted appears to be a li",
+        "score": 0.7665327787399292,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-28T21:10:47.238941",
+    "question": "tell me a joke",
+    "answer_preview": "I'm afraid I won't be able to tell you a joke. According to the forensic crime scene analysis report from Source 1, a PDF document, the context provided is focused on a serious incident, likely a homicide, and does not contain any humorous content. The report details a dimly lit room with a body on ...",
+    "answer_length": 645,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 1.194,
+    "grounding_score": 0.4,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Crime Scene Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be set in a study or a liv",
+        "score": 1.1939973831176758,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-28T21:20:02.428524",
+    "question": "tumhe ye scene dekh ke kya lgra hai",
+    "answer_preview": "According to the forensic crime scene analysis report from Source 1, a PDF document, the scene appears to be a residential setting, possibly a study or living room, with a body lying on the floor covered by a sheet. The room is dimly lit, with a single light source coming from a lamp, casting shadow...",
+    "answer_length": 1462,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 1,
+    "retrieval_relevance": 0.8561,
+    "grounding_score": 0.9,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "[Physical Evidence Image Analysis]\n## **Forensic Crime Scene Analysis Report**\n\n### **Scene Overview**\nThe scene appears to be set in a study or a liv",
+        "score": 0.8561140298843384,
+        "type": "pdf",
+        "page": 0
+      }
+    ]
+  }
+]

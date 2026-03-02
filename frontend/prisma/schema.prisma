@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ── Chat Sessions ──
+model Chat {
+  id               String    @id @default(cuid())
+  title            String
+  isHypothesisMode Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  messages         Message[]
+}
+
+// ── Chat Messages ──
+model Message {
+  id            String   @id @default(cuid())
+  chatId        String
+  chat          Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role          String   // "user" | "assistant"
+  content       String
+  sources       String?  // JSON array of source strings
+  contextChunks String?  // JSON array of context chunk objects
+  createdAt     DateTime @default(now())
+}
+
+// ── Evidence Reports (images, PDFs) ──
+model Report {
+  id           String   @id @default(cuid())
+  fileName     String
+  fileType     String   // "scene_image" | "evidence_image" | "pdf"
+  imageUrl     String?  // stored as base64 data URL or path
+  thumbnailUrl String?  // smaller preview
+  caption      String?  // LLM-generated caption
+  chunks       Int      @default(0)
+  caseId       String?
+  analysis     String?  // JSON string of SceneAnalysis
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
