@@ -122,6 +122,14 @@ export async function sendHypothesisChat(
   return response.data;
 }
 
+export async function sendForensicChat(
+  message: string,
+  history: { role: string; content: string }[]
+): Promise<ChatResponse> {
+  const response = await api.post('/api/forensic/chat', { message, history });
+  return response.data;
+}
+
 export async function analyzeScene(
   caption: string,
   filename: string,

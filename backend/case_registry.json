@@ -1170,7 +1170,7 @@
     ],
     "description": "Case ID not specified, date not mentioned, location not provided. A break-in or violent incident occurred at a residential apartment. Key evidence items include a large kitchen knife with a black handle on the floor and broken glass from the window. The scene shows disarray, with scattered glass shards on the floor and furniture. A gray sofa, wooden coffee table, and wooden shelf were present. The primary entry/exit point was a broken window leading to a balcony. No names of involved parties were mentioned.",
     "created_at": "2026-02-25T20:00:52.226578",
-    "file_count": 9
+    "file_count": 12
   },
   "CASE-20260226-ca6448": {
     "summary_embedding": [
@@ -1952,6 +1952,6 @@
     ],
     "description": "Case ID not specified, date not mentioned, location not provided. A residential scene, possibly a study or living room, was analyzed. Key evidence items include a glass tumbler with brown liquid, playing cards, and a person on the floor covered with a sheet. The incident appears to be a potential homicide. A man, wearing a brown trench coat and seated, was present in the room. The scene showed disarray, with objects scattered, suggesting a disturbance. A brown briefcase or folder and small white cards with numbers were also found. The type of incident is potentially a homicide, with the glass tumbler being a potential weapon or evidence.",
     "created_at": "2026-02-26T09:48:21.265106",
-    "file_count": 6
+    "file_count": 8
   }
 }

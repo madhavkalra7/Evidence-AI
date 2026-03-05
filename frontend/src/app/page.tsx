@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paperclip, Send, Bot, User, Loader2, Sparkles, ChevronDown, FileText, Image, Fingerprint, X, CheckCircle2, LayoutGrid, Eye, FolderOpen, ArrowLeft, Zap } from 'lucide-react';
+import { Paperclip, Send, Bot, User, Loader2, Sparkles, ChevronDown, FileText, Image, Fingerprint, X, CheckCircle2, LayoutGrid, Eye, FolderOpen, ArrowLeft, Zap, Shield, Search, Crosshair, Palette, Download } from 'lucide-react';
 import ReportsGallery, { type SavedReport } from '@/components/ReportsGallery';
 import ReactMarkdown from 'react-markdown';
 import { useDropzone } from 'react-dropzone';
@@ -12,7 +12,7 @@ import IntroVideo from '@/components/IntroVideo';
 import ThemeToggle from '@/components/ThemeToggle';
 import DetailPanel from '@/components/DetailPanel';
 import DetectiveBoard from '@/components/DetectiveBoard';
-import { getStatus, resetStore, sendMessage, sendHypothesisChat, uploadPDF, uploadImage, analyzeScene, type ChatResponse, type UploadResponse, type SceneAnalysis } from '@/lib/api';
+import { getStatus, resetStore, sendMessage, sendHypothesisChat, sendForensicChat, uploadPDF, uploadImage, analyzeScene, type ChatResponse, type UploadResponse, type SceneAnalysis } from '@/lib/api';
 import type { EvidenceItem } from '@/components/EvidenceBoard3D';
 
 const UnicornBackground = dynamic(() => import('@/components/UnicornBackground'), {
@@ -27,12 +27,24 @@ const SceneAnalysisModal = dynamic(() => import('@/components/SceneAnalysisModal
   ssr: false,
 });
 
+const BodyModel3DDynamic = dynamic(() => import('@/components/BodyModel3D'), {
+  ssr: false,
+});
+
+const PromptInputBoxDynamic = dynamic(
+  () => import('@/components/ui/ai-prompt-box').then((mod) => ({ default: mod.PromptInputBox })),
+  { ssr: false }
+);
 
 
 /* ============================================================
    PAGE — Evidence.AI
    FullScreen Unicorn BG + ChatGPT-style sidebar + centered chat
    ============================================================ */
+
+const GRADIENT_THEMES = ['green', 'blue', 'purple', 'crimson', 'amber', 'cyan', 'pink', 'detective'] as const;
+type GradientTheme = typeof GRADIENT_THEMES[number];
+const getRandomGradient = (): GradientTheme => GRADIENT_THEMES[Math.floor(Math.random() * GRADIENT_THEMES.length)];
 
 interface UploadedFile {
   id: string;
@@ -79,6 +91,10 @@ export default function Home() {
   const [showReportsGallery, setShowReportsGallery] = useState(false);
   const [showBlast, setShowBlast] = useState(false);
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
+  const [gradientTheme, setGradientTheme] = useState<GradientTheme>('green');
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [pdfDownloads, setPdfDownloads] = useState<Record<string, { url: string; fileName: string }>>({});
+  const [showAbout, setShowAbout] = useState(false);
 
   // Scene Analysis Modal state
   const [sceneModalOpen, setSceneModalOpen] = useState(false);
@@ -117,6 +133,28 @@ export default function Home() {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('evidenceai-theme', theme);
   }, [theme]);
+
+  // Gradient theme: persist + set data-gradient on <html>
+  useEffect(() => {
+    const savedGradient = localStorage.getItem('evidenceai-gradient') as GradientTheme | null;
+    if (savedGradient && GRADIENT_THEMES.includes(savedGradient)) {
+      setGradientTheme(savedGradient);
+    } else {
+      const random = getRandomGradient();
+      setGradientTheme(random);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-gradient', gradientTheme);
+    localStorage.setItem('evidenceai-gradient', gradientTheme);
+  }, [gradientTheme]);
+
+  const cycleGradient = () => {
+    const currentIdx = GRADIENT_THEMES.indexOf(gradientTheme);
+    const nextIdx = (currentIdx + 1) % GRADIENT_THEMES.length;
+    setGradientTheme(GRADIENT_THEMES[nextIdx]);
+  };
 
   const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
 
@@ -338,6 +376,8 @@ export default function Home() {
     setUploadedFiles([]);
     setSceneAnalyses({});
     setAnalyzingFiles({});
+    // Random gradient on every new chat
+    setGradientTheme(getRandomGradient());
     createChat();
   };
 
@@ -375,13 +415,20 @@ export default function Home() {
   };
 
   // ── Send message ──
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (directMessage?: string) => {
+    const messageText = directMessage || input;
+    if (!messageText.trim() || isLoading) return;
+
+    // Check if this is a forensic chatbot message
+    const isForensicMode = messageText.startsWith('[Forensic:');
+    const cleanMessage = isForensicMode
+      ? messageText.replace(/^\[Forensic:\s*/, '').replace(/\]$/, '').trim()
+      : messageText.trim();
 
     let chat = activeChat;
     if (!chat) chat = createChat();
 
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: input.trim() };
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: cleanMessage };
     const isHypothesis = chat.isHypothesisMode || false;
 
     setChats((prev) =>
@@ -403,7 +450,14 @@ export default function Home() {
 
     try {
       let res: ChatResponse;
-      if (isHypothesis) {
+      if (isForensicMode) {
+        // Forensic chatbot mode — no evidence needed
+        const history = [...(chat.messages || []), userMsg].map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+        res = await sendForensicChat(cleanMessage, history.slice(0, -1));
+      } else if (isHypothesis) {
         // Build history from existing messages for context
         const history = [...(chat.messages || []), userMsg].map((m) => ({
           role: m.role,
@@ -471,6 +525,256 @@ export default function Home() {
       setChats((prev) => prev.map((c) => c.id === chat!.id ? { ...c, messages: [...c.messages, errMsg] } : c));
     }
     setIsLoading(false);
+  };
+
+  // ── Canvas Mode: Generate PDF Report from Image ──
+  const generatePdfReport = async (imageFile: File, userNotes: string) => {
+    setIsGeneratingPdf(true);
+    let chat = activeChat;
+    if (!chat) chat = createChat();
+
+    // Add user message
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: `📄 Generate PDF Report: ${imageFile.name}${userNotes ? ` — ${userNotes}` : ''}`,
+    };
+    setChats((prev) =>
+      prev.map((c) => {
+        if (c.id !== chat!.id) return c;
+        const updated = { ...c, messages: [...c.messages, userMsg] };
+        if (c.messages.length === 0 || c.title === 'New Analysis') {
+          updated.title = `📄 Report: ${imageFile.name.slice(0, 30)}`;
+        }
+        return updated;
+      })
+    );
+
+    try {
+      // Read image as data URL
+      const imageDataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile);
+      });
+
+      // Upload image to backend for analysis
+      let caption = '';
+      try {
+        const uploadRes = await uploadImage(imageFile, 'evidence_image');
+        caption = uploadRes.caption || '';
+      } catch { /* continue without caption */ }
+
+      // Get AI analysis if we got a caption
+      let aiAnalysis = '';
+      if (caption) {
+        try {
+          const chatRes = await sendMessage(`Analyze this evidence image and provide a detailed forensic report. The image shows: ${caption}. ${userNotes ? `Additional notes: ${userNotes}` : ''}`);
+          aiAnalysis = chatRes.answer;
+        } catch { /* continue without AI analysis */ }
+      }
+
+      // Helper: clean markdown formatting and source references from text
+      const cleanText = (text: string) =>
+        text
+          .replace(/#{1,6}\s?/g, '')
+          .replace(/\*\*(.*?)\*\*/g, '$1')
+          .replace(/\*(.*?)\*/g, '$1')
+          .replace(/`(.*?)`/g, '$1')
+          .replace(/\[Source\s*\d+\]/gi, '')
+          .replace(/\[(\d+)\]/g, '')
+          .replace(/---+/g, '')
+          // Remove orphaned source-reference phrases like "According to ," "as described by and ,"
+          .replace(/(?:According to|as described by|as noted by|as identified by|as mentioned in|including)\s*(?:and\s*)?\s*,/gi, '')
+          .replace(/,\s*which also/gi, ', which')
+          .replace(/from various sources,?/gi, '')
+          .replace(/across multiple sources,?\s*(?:including)?/gi, '')
+          .replace(/\s*,\s*,/g, ',')
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+
+      // Generate PDF with jsPDF
+      const { default: jsPDF } = await import('jspdf');
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
+      const contentWidth = pageWidth - margin * 2;
+      const footerY = pageHeight - 12;
+      const maxContentY = footerY - 8; // leave gap above footer
+      let y = margin;
+
+      const caseId = `CASE-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      const reportDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      // Helper: check page break needed
+      const checkPage = (needed: number) => {
+        if (y + needed > maxContentY) {
+          doc.addPage();
+          y = margin;
+        }
+      };
+
+      // Helper: print section heading
+      const printHeading = (title: string) => {
+        checkPage(14);
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(10, 61, 53);
+        doc.text(title, margin, y);
+        y += 2;
+        doc.setDrawColor(42, 140, 106);
+        doc.setLineWidth(0.3);
+        doc.line(margin, y, margin + doc.getTextWidth(title) + 6, y);
+        y += 6;
+      };
+
+      // Helper: print body text with auto page-break
+      const printBody = (text: string) => {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(50, 50, 50);
+        const lines = doc.splitTextToSize(cleanText(text), contentWidth);
+        for (const line of lines) {
+          checkPage(6);
+          doc.text(line, margin, y);
+          y += 5;
+        }
+        y += 3;
+      };
+
+      // ─── HEADER ───
+      doc.setFillColor(10, 61, 53);
+      doc.rect(0, 0, pageWidth, 38, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Evidence.AI — Forensic Incident Report', margin, 18);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Case ID: ${caseId}   |   Date: ${reportDate}`, margin, 28);
+      doc.text(`File: ${imageFile.name}   |   Type: Evidence Image Analysis`, margin, 34);
+
+      y = 48;
+
+      // Divider
+      doc.setDrawColor(42, 140, 106);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 10;
+
+      // ─── EVIDENCE IMAGE ───
+      try {
+        const img = new window.Image();
+        img.src = imageDataUrl;
+        await new Promise((resolve) => { img.onload = resolve; });
+        const aspectRatio = img.width / img.height;
+        const imgWidth = Math.min(contentWidth, 110);
+        const imgHeight = imgWidth / aspectRatio;
+        checkPage(imgHeight + 10);
+        const imgX = (pageWidth - imgWidth) / 2;
+        doc.addImage(imageDataUrl, 'JPEG', imgX, y, imgWidth, imgHeight);
+        y += imgHeight + 10;
+      } catch {
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.text('[Image could not be embedded]', margin, y);
+        y += 10;
+      }
+
+      // ─── INCIDENT OVERVIEW ───
+      printHeading('Incident Overview');
+      printBody(`Evidence file: ${imageFile.name}`);
+      printBody(`Date of analysis: ${reportDate}`);
+      if (caption) {
+        printBody(caption);
+      } else {
+        printBody('Evidence image uploaded for analysis. No automated description available.');
+      }
+
+      // ─── EVIDENCE COLLECTED ───
+      printHeading('Evidence Collected');
+      printBody(`Primary exhibit: ${imageFile.name} (digital image)`);
+      if (userNotes) {
+        printBody(`Investigator notes: ${userNotes}`);
+      }
+
+      // ─── FORENSIC ANALYSIS ───
+      printHeading('Forensic Analysis');
+      if (aiAnalysis) {
+        printBody(aiAnalysis);
+      } else {
+        printBody('AI analysis not available. Please ensure evidence has been uploaded to the backend for processing.');
+      }
+
+      // ─── CONCLUSION ───
+      printHeading('Conclusion');
+      printBody('Based on the analysis above, further investigation is recommended. All findings should be corroborated with physical evidence examination and witness statements. Cross-reference these visual observations with additional case files for consistency.');
+
+      // ─── FOOTER on every page ───
+      const pageCount = doc.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`Evidence.AI — Confidential Forensic Report — Page ${i} of ${pageCount}`, pageWidth / 2, footerY, { align: 'center' });
+      }
+
+      // Create blob and download link
+      const pdfBlob = doc.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const fileName = `EvidenceAI_Report_${Date.now()}.pdf`;
+
+      // Add AI message with download link
+      const msgId = (Date.now() + 1).toString();
+      const aiMsg: Message = {
+        id: msgId,
+        role: 'assistant',
+        content: `✅ **PDF Report Generated Successfully!**\n\n📄 **${fileName}**\n\nYour forensic report has been generated with:\n- Evidence image analysis\n${caption ? '- AI image description\n' : ''}${aiAnalysis ? '- Detailed forensic analysis\n' : ''}${userNotes ? '- Investigator notes\n' : ''}\n📥 Click the download button below to save your report.`,
+      };
+      setChats((prev) => prev.map((c) => c.id === chat!.id ? { ...c, messages: [...c.messages, aiMsg] } : c));
+
+      // Store download URL for the inline download button
+      setPdfDownloads((prev) => ({ ...prev, [msgId]: { url: pdfUrl, fileName } }));
+
+      // Also trigger auto-download
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(pdfUrl), 30000);
+    } catch (err: any) {
+      const errMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `❌ Failed to generate PDF report: ${err?.message || 'Unknown error'}. Please try again.`,
+      };
+      setChats((prev) => prev.map((c) => c.id === chat!.id ? { ...c, messages: [...c.messages, errMsg] } : c));
+    }
+    setIsGeneratingPdf(false);
+  };
+
+  // ── Unified handler for PromptInputBox ──
+  const handlePromptSend = (message: string, promptFiles?: File[]) => {
+    const isCanvasMode = message.startsWith('[Canvas:');
+    const hasImageFile = promptFiles?.some((f) => f.type.startsWith('image/'));
+
+    if (isCanvasMode && hasImageFile && promptFiles) {
+      const imageFile = promptFiles.find((f) => f.type.startsWith('image/'));
+      if (imageFile) {
+        // Extract user notes from canvas message
+        const notes = message.replace(/^\[Canvas:\s*/, '').replace(/\]$/, '').trim();
+        generatePdfReport(imageFile, notes);
+        return;
+      }
+    }
+
+    // Normal flow: upload files + send message
+    if (promptFiles && promptFiles.length > 0) onDrop(promptFiles);
+    if (message.trim()) handleSend(message);
   };
 
   const removeUploadedFile = (id: string) => {
@@ -651,12 +955,9 @@ export default function Home() {
             {!showIntro && (
               <div className="db-top-buttons">
                 <button className="db-top-link" onClick={() => setShowReportsGallery(true)}>CASE FILES</button>
-                <button className="db-top-link">ANALYSIS TOOLS</button>
-                <button className="db-top-link">FORENSIC DATABASE</button>
-                <button className="db-top-link">ABOUT</button>
+                <button className="db-top-link" onClick={() => setShowAbout(true)}>ABOUT</button>
                 <button className="db-top-btn" onClick={() => handleNewChat()}>NEW CHAT</button>
                 <button className="db-top-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>CHAT HISTORY</button>
-                <button className="db-top-btn db-top-btn-login">LOGIN</button>
               </div>
             )}
 
@@ -687,13 +988,18 @@ export default function Home() {
             />
           </>
         ) : (
-          /* ── CHAT STATE — Messages + bottom input ── */
+          /* ── CHAT STATE — Xrio-style Gradient Chat UI ── */
           <>
-            {/* Unicorn Background for chat */}
-            <UnicornBackground theme={theme} />
+            {/* Gradient Background */}
+            <div className="chat-gradient-bg" />
 
-            {/* Theme Toggle */}
-            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+            {/* Detective 3D body models — only visible on detective theme */}
+            {gradientTheme === 'detective' && (
+              <>
+                <BodyModel3DDynamic side="left" />
+                <BodyModel3DDynamic side="right" />
+              </>
+            )}
 
             {/* Sidebar for chat */}
             <Sidebar
@@ -710,336 +1016,437 @@ export default function Home() {
 
             {/* Chat content area */}
             <div
-              className="chat-content-area relative z-10 flex flex-col h-full transition-all duration-300"
+              className="relative z-10 flex flex-col h-full transition-all duration-500 ease-out"
               style={{ marginLeft: sidebarOpen ? 270 : 0 }}
             >
-            {/* Back button — always visible at top of chat */}
-            <div className="flex items-center gap-3 p-4 sm:p-6 md:p-10 pb-0">
-              <button
-                onClick={() => setActiveChatId(null)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl
-                  bg-white/[0.05] border border-white/[0.08] text-white/50
-                  hover:text-white/80 hover:bg-white/[0.08]
-                  transition-all duration-200 text-[13px]"
+              {/* Top bar — Logo + Nav + Theme Toggle */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="flex items-center justify-between px-5 sm:px-8 py-4"
               >
-                <ArrowLeft size={20} />
-                <span>Back to Board</span>
-              </button>
-            </div>
+                {/* Logo */}
+                <button
+                  onClick={() => setActiveChatId(null)}
+                  className="flex items-center gap-2 group"
+                >
+                  <span className="text-xl font-black tracking-tight chat-text-primary">
+                    Evidence<span className="chat-text-accent">.AI</span>
+                  </span>
+                </button>
 
-            {/* Messages area */}
-            <div className="flex-1 overflow-y-auto">
-              {isChatEmpty ? (
-                <div className="h-full flex flex-col items-center justify-center space-y-6 max-w-3xl mx-auto px-4 text-center pb-20">
-                  {isHypothesisChat ? (
-                    <>
-                      {/* Hypothesis mode empty state */}
-                      <div className="w-20 h-20 rounded-[2rem] bg-blue-500/[0.08] border border-blue-400/[0.15] flex items-center justify-center mb-2">
-                        <Zap size={36} className="text-white-400/70" />
-                      </div>
-                      <div className="mb-1">
-                        <h1 className="text-[20px] font-bold tracking-tight text-white-400/80">
-                          🕵️ AI Hypothesis Generator
-                        </h1>
-                        <p className="text-[11px] text-white/25 mt-1 tracking-widest uppercase">Level 3 — Investigator Mode</p>
-                      </div>
-                      <h2 className="text-2xl font-bold tracking-tight text-white/90">Describe the incident</h2>
-                      <p className="text-white/50 text-[14px] max-w-lg mx-auto leading-relaxed">
-                        Tell me what happened — describe the crime scene, the victim, the circumstances. 
-                        I'll generate competing hypotheses with evidence strength ratings. 
-                        You can also upload photos or reports for deeper analysis.
-                      </p>
-                      <div className="flex flex-wrap gap-2 justify-center mt-2">
-                        {['🔪 "A body was found in the kitchen with no forced entry"',
-                          '🏦 "Bank vault breached, no alarms triggered"',
-                          '🔥 "Warehouse fire, possible arson"'
-                        ].map((hint) => (
-                          <button
-                            key={hint}
-                            onClick={() => setInput(hint.replace(/^[^\s]+ "/, '').replace(/"$/, ''))}
-                            className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06]
-                              text-[12px] text-white/40 hover:text-white/70 hover:bg-white/[0.07]
-                              transition-all duration-200"
-                          >
-                            {hint}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Normal chat empty state */}
-                      <div className="w-20 h-20 rounded-[2rem] bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-2">
-                        <Fingerprint size={36} className="text-white/40" />
-                      </div>
-                      <div className="mb-2">
-                        <h1 className="text-[22px] font-bold tracking-tight text-white/80">
-                          Evidence<span className="text-white/35">.AI</span>
-                        </h1>
-                      </div>
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white/90">How can I help with the case?</h2>
-                      <p className="text-white/50 text-[15px] max-w-md mx-auto leading-relaxed">
-                        Upload crime scene photos, forensic reports, or ask me to analyze existing suspects.
-                      </p>
-                    </>
-                  )}
+                {/* Center nav pills */}
+                <div className="hidden sm:flex items-center gap-1 px-2 py-1.5 rounded-full chat-nav-pill-container">
+                  <button onClick={() => setActiveChatId(null)} className="chat-nav-pill">Home</button>
+                  <button onClick={() => setShowReportsGallery(true)} className="chat-nav-pill">Case Files</button>
+                  <button onClick={() => setSidebarOpen(!sidebarOpen)} className="chat-nav-pill">History</button>
                 </div>
-              ) : (
-                <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-                <AnimatePresence>
-                  {messages.map((msg) => (
+
+                {/* Right side: Actions */}
+                <div className="flex items-center gap-2">
+                  {isHypothesisChat && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full
+                      bg-amber-500/[0.08] border border-amber-500/[0.15]">
+                      <Zap size={12} className="text-amber-400" />
+                      <span className="text-[11px] text-amber-300/80 font-medium">Hypothesis Mode</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={() => handleNewChat()}
+                    className="chat-contact-btn"
+                  >
+                    <Sparkles size={14} />
+                    <span>New Chat</span>
+                  </button>
+                  <div className="w-px h-5 bg-current opacity-10 mx-1" />
+                  <ThemeToggle theme={theme} onToggle={toggleTheme} />
+                  <div className="ml-1">
+                    <button
+                      onClick={cycleGradient}
+                      className="color-changer-btn"
+                      title="Change color theme"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Messages area */}
+              <div className="flex-1 overflow-y-auto scrollbar-forensic">
+                {isChatEmpty ? (
+                  <div className="h-full flex flex-col items-center justify-center max-w-3xl mx-auto px-4 text-center">
                     <motion.div
-                      key={msg.id}
-                      initial={{ opacity: 0, y: 12 }}
+                      initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                      className="w-full space-y-10"
                     >
-                      {msg.role === 'assistant' && (
-                        <div className="flex-shrink-0 w-8 h-8 rounded-xl msg-avatar-ai flex items-center justify-center mt-0.5">
-                          <Bot size={15} className="text-white/60" />
-                        </div>
-                      )}
+                      {isHypothesisChat ? (
+                        <>
+                          <div>
+                            <h1 className="text-5xl sm:text-7xl font-black tracking-tighter chat-hero-title">
+                              Hypothesis
+                            </h1>
+                            <p className="text-sm chat-text-muted mt-3">
+                              Describe the crime scene, the victim, the circumstances.
+                            </p>
+                          </div>
 
-                      <div className={`max-w-[90%] sm:max-w-[75%] space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                        <div className={`px-4 py-3 rounded-2xl text-[14px] leading-[1.7]
-                          ${msg.role === 'user'
-                            ? 'msg-bubble-user text-white/90 rounded-br-md'
-                            : 'msg-bubble-ai text-white/80 rounded-bl-md'
-                          }`}
-                        >
-                          {msg.role === 'assistant' ? (
-                            <div className="markdown-content"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
-                          ) : msg.content}
-                        </div>
+                          {/* Input box */}
+                          <div className="w-full max-w-2xl mx-auto">
+                            <PromptInputBoxDynamic
+                              onSend={handlePromptSend}
+                              isLoading={isLoading || isGeneratingPdf}
+                              placeholder="Describe the incident or ask about a hypothesis..."
+                            />
+                          </div>
 
-                        {/* Image thumbnail + Open Scene button */}
-                        {msg.role === 'assistant' && msg.content.includes('🖼️') && (() => {
-                          const fName = msg.content.match(/`([^`]+)`/)?.[1] || '';
-                          const matchedFile = uploadedFiles.find((uf) => uf.name === fName);
-                          const imgType = msg.content.includes('Crime Scene') ? 'scene_image' as const : 'evidence_image' as const;
-                          const isAnalyzingThis = analyzingFiles[fName];
-                          const hasAnalysis = !!sceneAnalyses[fName];
-                          return (
-                            <motion.div
-                              initial={{ opacity: 0, y: 8 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.15 }}
-                              className="chat-image-row mt-3"
-                            >
-                              {matchedFile?.imageUrl && (
-                                <img
-                                  src={matchedFile.imageUrl}
-                                  alt={fName}
-                                  className="chat-image-thumbnail"
-                                />
-                              )}
-                              <button
-                                className="open-scene-btn"
-                                onClick={() => handleOpenScene(fName, imgType)}
-                                disabled={!matchedFile?.imageUrl}
+                          {/* Pre-prompts */}
+                          <div className="flex flex-wrap gap-3 justify-center">
+                            {[
+                              { icon: '🔪', text: 'A body was found in the kitchen with no forced entry' },
+                              { icon: '🏦', text: 'Bank vault breached, no alarms triggered' },
+                              { icon: '🔥', text: 'Warehouse fire, possible arson' },
+                            ].map(({ icon, text }) => (
+                              <motion.button
+                                key={text}
+                                whileHover={{ scale: 1.02, y: -2 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => handleSend(text)}
+                                className="chat-suggestion-chip"
                               >
-                                <span className="open-scene-btn-dot" />
-                                {isAnalyzingThis ? (
-                                  <>
-                                    <Loader2 size={15} className="animate-spin" />
-                                    <span>Analyzing…</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Eye size={15} />
-                                    <span>Open Scene</span>
-                                  </>
-                                )}
-                                {hasAnalysis && (
-                                  <span style={{ fontSize: '10px', opacity: 0.5 }}>
-                                    ({sceneAnalyses[fName]?.findings.length} findings)
-                                  </span>
-                                )}
-                              </button>
-                            </motion.div>
-                          );
-                        })()}
-
-                        {/* Sources */}
-                        {msg.sources && msg.sources.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5">
-                            {msg.sources.map((src, i) => (
-                              <span key={i} className="source-tag inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-medium">
-                                {src.includes('pdf') ? <FileText size={9} /> : <Image size={9} />}
-                                {src}
-                              </span>
+                                <span>{icon}</span>
+                                <span>{text}</span>
+                              </motion.button>
                             ))}
                           </div>
-                        )}
-
-                        {/* RAG Context toggle */}
-                        {msg.contextChunks && msg.contextChunks.length > 0 && (
+                        </>
+                      ) : (
+                        <>
+                          {/* Big hero title like Xrio — with glitch animation */}
                           <div>
-                            <button
-                              onClick={() => setShowContext(showContext === msg.id ? null : msg.id)}
-                              className="flex items-center gap-1 text-[10px] text-white/20 hover:text-white/40 transition-colors"
-                            >
-                              <ChevronDown size={12} className={`transition-transform duration-200 ${showContext === msg.id ? 'rotate-180' : ''}`} />
-                              RAG Context ({msg.contextChunks.length} chunks)
-                            </button>
-                            <AnimatePresence>
-                              {showContext === msg.id && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: 'auto', opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  className="mt-2 space-y-1.5 overflow-hidden"
-                                >
-                                  {msg.contextChunks.map((chunk, i) => (
-                                    <div key={i} className="context-chunk p-2.5 rounded-xl text-[11px]">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-wider
-                                          ${chunk.type === 'pdf' ? 'bg-blue-500/10 text-blue-400/60' : chunk.type === 'scene_image' ? 'bg-rose-500/10 text-rose-400/60' : 'bg-emerald-500/10 text-emerald-400/60'}`}>
-                                          {chunk.type}
-                                        </span>
-                                        {chunk.page > 0 && <span className="text-white/15">p.{chunk.page}</span>}
-                                        <span className="text-white/15 ml-auto font-mono text-[10px]">{chunk.score.toFixed(4)}</span>
-                                      </div>
-                                      <p className="text-white/30 leading-relaxed">{chunk.text}</p>
-                                    </div>
-                                  ))}
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
+                            <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black tracking-tighter chat-hero-title leading-[0.9] glitch-text" data-text="Evidence.AI">
+                              Evidence<span className="chat-hero-accent">.AI</span>
+                            </h1>
+                            <p className="text-sm sm:text-base chat-text-muted mt-4 max-w-md mx-auto leading-relaxed">
+                              Upload evidence documents & crime scene images.<br />
+                              Let AI analyze, connect dots and generate forensic reports.
+                            </p>
                           </div>
-                        )}
-                      </div>
 
-                      {msg.role === 'user' && (
-                        <div className="flex-shrink-0 w-8 h-8 rounded-xl msg-avatar-user flex items-center justify-center mt-0.5">
-                          <User size={14} className="text-white/50" />
-                        </div>
+                          {/* Input box — centered like Xrio */}
+                          <div className="w-full max-w-2xl mx-auto">
+                            <PromptInputBoxDynamic
+                              onSend={handlePromptSend}
+                              isLoading={isLoading || isGeneratingPdf}
+                              placeholder="What do you want to know?"
+                            />
+                          </div>
+
+                          {/* Pre-prompt suggestions */}
+                          <div className="flex flex-wrap gap-2.5 justify-center max-w-2xl mx-auto">
+                            {[
+                              { icon: Search, text: 'What evidence was found at the scene?' },
+                              { icon: FileText, text: 'Summarize the incident report' },
+                              { icon: Crosshair, text: 'Build a timeline of events' },
+                              { icon: Fingerprint, text: 'Analyze fingerprint matches' },
+                              { icon: Shield, text: 'Identify suspect connections' },
+                            ].map(({ icon: Icon, text }) => (
+                              <motion.button
+                                key={text}
+                                whileHover={{ scale: 1.03, y: -2 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => handleSend(text)}
+                                className="chat-suggestion-chip"
+                              >
+                                <Icon size={14} />
+                                <span>{text}</span>
+                              </motion.button>
+                            ))}
+                          </div>
+
+                        </>
                       )}
                     </motion.div>
-                  ))}
-                </AnimatePresence>
+                  </div>
+                ) : (
+                  <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+                    <AnimatePresence>
+                      {messages.map((msg, msgIdx) => (
+                        <motion.div
+                          key={msg.id}
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.4, delay: msgIdx < 3 ? msgIdx * 0.1 : 0, ease: [0.16, 1, 0.3, 1] }}
+                          className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          {msg.role === 'assistant' && (
+                            <div className="flex-shrink-0 w-9 h-9 rounded-2xl chat-avatar-ai flex items-center justify-center mt-0.5">
+                              <Bot size={16} className="chat-avatar-ai-icon" />
+                            </div>
+                          )}
 
-                {/* Loading indicator */}
-                {isLoading && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-                    <div className="w-8 h-8 rounded-xl msg-avatar-ai flex items-center justify-center">
-                      <Bot size={15} className="text-white/60" />
-                    </div>
-                    <div className="msg-bubble-ai px-4 py-3 rounded-2xl rounded-bl-md">
-                      <div className="flex items-center gap-2.5">
-                        <Loader2 size={14} className="text-white/40 animate-spin" />
-                        <span className="text-[12px] text-white/25">Analyzing evidence...</span>
-                      </div>
-                      <div className="flex gap-1.5 mt-2">
-                        <div className="typing-dot w-1.5 h-1.5 bg-white/20 rounded-full" />
-                        <div className="typing-dot w-1.5 h-1.5 bg-white/20 rounded-full" />
-                        <div className="typing-dot w-1.5 h-1.5 bg-white/20 rounded-full" />
-                      </div>
-                    </div>
-                  </motion.div>
+                          <div className={`max-w-[90%] sm:max-w-[75%] space-y-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                            <div className={`px-4 py-3.5 rounded-2xl text-[14px] leading-[1.75]
+                              ${msg.role === 'user'
+                                ? 'chat-msg-user rounded-br-md'
+                                : 'chat-msg-ai rounded-bl-md'
+                              }`}
+                            >
+                              {msg.role === 'assistant' ? (
+                                <div className="markdown-content"><ReactMarkdown>{msg.content}</ReactMarkdown></div>
+                              ) : msg.content}
+                            </div>
+
+                            {/* PDF Download button */}
+                            {msg.role === 'assistant' && pdfDownloads[msg.id] && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.15 }}
+                                className="mt-2"
+                              >
+                                <a
+                                  href={pdfDownloads[msg.id].url}
+                                  download={pdfDownloads[msg.id].fileName}
+                                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
+                                    bg-orange-500/[0.1] border border-orange-500/20 text-orange-400
+                                    hover:bg-orange-500/[0.2] transition-all duration-200 text-[13px] font-medium"
+                                >
+                                  <Download size={16} />
+                                  <span>Download {pdfDownloads[msg.id].fileName}</span>
+                                </a>
+                              </motion.div>
+                            )}
+
+                            {/* Image thumbnail + Open Scene button */}
+                            {msg.role === 'assistant' && msg.content.includes('🖼️') && (() => {
+                              const fName = msg.content.match(/`([^`]+)`/)?.[1] || '';
+                              const matchedFile = uploadedFiles.find((uf) => uf.name === fName);
+                              const imgType = msg.content.includes('Crime Scene') ? 'scene_image' as const : 'evidence_image' as const;
+                              const isAnalyzingThis = analyzingFiles[fName];
+                              const hasAnalysis = !!sceneAnalyses[fName];
+                              return (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 8 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.15 }}
+                                  className="flex items-center gap-3 mt-3"
+                                >
+                                  {matchedFile?.imageUrl && (
+                                    <img
+                                      src={matchedFile.imageUrl}
+                                      alt={fName}
+                                      className="w-16 h-16 rounded-xl object-cover border border-white/10"
+                                    />
+                                  )}
+                                  <button
+                                    className="flex items-center gap-2 px-4 py-2 rounded-xl
+                                      bg-cyan-500/[0.08] border border-cyan-500/15 text-cyan-300/80
+                                      hover:bg-cyan-500/[0.15] transition-all duration-200 text-[12px]"
+                                    onClick={() => handleOpenScene(fName, imgType)}
+                                    disabled={!matchedFile?.imageUrl}
+                                  >
+                                    {isAnalyzingThis ? (
+                                      <>
+                                        <Loader2 size={14} className="animate-spin" />
+                                        <span>Analyzing…</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Eye size={14} />
+                                        <span>Open Scene</span>
+                                      </>
+                                    )}
+                                    {hasAnalysis && (
+                                      <span className="text-[10px] opacity-50">
+                                        ({sceneAnalyses[fName]?.findings.length} findings)
+                                      </span>
+                                    )}
+                                  </button>
+                                </motion.div>
+                              );
+                            })()}
+
+                            {/* Sources */}
+                            {msg.sources && msg.sources.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 mt-1">
+                                {msg.sources.map((src, i) => (
+                                  <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-medium
+                                    bg-amber-500/[0.06] border border-amber-500/10 text-amber-400/60">
+                                    {src.includes('pdf') ? <FileText size={9} /> : <Image size={9} />}
+                                    {src}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* RAG Context toggle */}
+                            {msg.contextChunks && msg.contextChunks.length > 0 && (
+                              <div>
+                                <button
+                                  onClick={() => setShowContext(showContext === msg.id ? null : msg.id)}
+                                  className="flex items-center gap-1.5 text-[10px] text-white/20 hover:text-cyan-400/50 transition-colors mt-1"
+                                >
+                                  <ChevronDown size={12} className={`transition-transform duration-200 ${showContext === msg.id ? 'rotate-180' : ''}`} />
+                                  RAG Context ({msg.contextChunks.length} chunks)
+                                </button>
+                                <AnimatePresence>
+                                  {showContext === msg.id && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      className="mt-2 space-y-1.5 overflow-hidden"
+                                    >
+                                      {msg.contextChunks.map((chunk, i) => (
+                                        <div key={i} className="p-3 rounded-xl text-[11px]
+                                          bg-white/[0.02] border border-white/[0.05] backdrop-blur-sm">
+                                          <div className="flex items-center gap-2 mb-1.5">
+                                            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-medium uppercase tracking-wider
+                                              ${chunk.type === 'pdf' ? 'bg-blue-500/10 text-blue-400/60' : chunk.type === 'scene_image' ? 'bg-rose-500/10 text-rose-400/60' : 'bg-emerald-500/10 text-emerald-400/60'}`}>
+                                              {chunk.type}
+                                            </span>
+                                            {chunk.page > 0 && <span className="text-white/15">p.{chunk.page}</span>}
+                                            <span className="text-white/15 ml-auto font-mono text-[10px]">{chunk.score.toFixed(4)}</span>
+                                          </div>
+                                          <p className="text-white/30 leading-relaxed">{chunk.text}</p>
+                                        </div>
+                                      ))}
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            )}
+                          </div>
+
+                          {msg.role === 'user' && (
+                            <div className="flex-shrink-0 w-9 h-9 rounded-2xl chat-avatar-user flex items-center justify-center mt-0.5">
+                              <User size={15} className="chat-avatar-user-icon" />
+                            </div>
+                          )}
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+
+                    {/* Loading indicator */}
+                    {isLoading && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex gap-3"
+                      >
+                        <div className="w-9 h-9 rounded-2xl chat-avatar-ai flex items-center justify-center">
+                          <Bot size={16} className="chat-avatar-ai-icon" />
+                        </div>
+                        <div className="px-5 py-4 rounded-2xl rounded-bl-md chat-msg-ai">
+                          <div className="flex items-center gap-3">
+                            <div className="relative w-5 h-5">
+                              <div className="absolute inset-0 rounded-full border-2 chat-spinner animate-spin" />
+                            </div>
+                            <span className="text-[12px] chat-text-muted font-mono">Analyzing evidence...</span>
+                          </div>
+                          <div className="flex gap-1.5 mt-2.5">
+                            {[0, 1, 2].map(i => (
+                              <motion.div
+                                key={i}
+                                animate={{ opacity: [0.2, 0.6, 0.2] }}
+                                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                                className="w-1.5 h-1.5 chat-loading-dot rounded-full"
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* PDF Generating animation */}
+                    {isGeneratingPdf && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex gap-3"
+                      >
+                        <div className="w-9 h-9 rounded-2xl chat-avatar-ai flex items-center justify-center">
+                          <Bot size={16} className="chat-avatar-ai-icon" />
+                        </div>
+                        <div className="relative px-6 py-5 rounded-2xl rounded-bl-md pdf-generating-card overflow-hidden max-w-xs">
+                          <div className="pdf-scan-line" />
+                          <div className="flex items-center gap-3 mb-3">
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                            >
+                              <FileText size={20} className="text-orange-400" />
+                            </motion.div>
+                            <span className="text-[13px] font-semibold text-orange-300">Generating PDF Report...</span>
+                          </div>
+                          <div className="space-y-2">
+                            {['Analyzing image...', 'Running forensic analysis...', 'Building report...'].map((step, i) => (
+                              <motion.div
+                                key={step}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: [0.3, 1, 0.3] }}
+                                transition={{ duration: 2, repeat: Infinity, delay: i * 0.6 }}
+                                className="flex items-center gap-2"
+                              >
+                                <div className="w-1.5 h-1.5 rounded-full bg-orange-400/50" />
+                                <span className="text-[11px] text-white/40 font-mono">{step}</span>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
                 )}
               </div>
-              )}
-            </div>
 
-            {/* Uploaded files pills — chat state */}
-            {uploadedFiles.length > 0 && (
-              <div className="px-4">
-                <div className="max-w-3xl mx-auto">
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {uploadedFiles.map((f) => (
-                      <div
-                        key={f.id}
-                        className="uploaded-file-pill flex items-center gap-2 px-3 py-1.5 rounded-xl text-[12px]"
-                      >
-                        {f.status === 'uploading' ? (
-                          <Loader2 size={12} className="animate-spin text-white/40" />
-                        ) : f.status === 'done' ? (
-                          <CheckCircle2 size={12} className="text-emerald-400/70" />
-                        ) : (
-                          <X size={12} className="text-red-400/70" />
-                        )}
-                        {f.type === 'pdf' ? <FileText size={12} className="text-white/30" /> : <Image size={12} className="text-white/30" />}
-                        <span className="text-white/50 max-w-[150px] truncate">{f.name}</span>
-                        {f.status === 'done' && <span className="text-white/20 text-[10px]">{f.chunks} chunks</span>}
-                        <button onClick={() => removeUploadedFile(f.id)} className="text-white/20 hover:text-white/50 transition-colors ml-1">
-                          <X size={11} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Bottom input bar */}
-            <div className="pb-3 sm:pb-5 px-2 sm:px-4">
-              <div className="max-w-3xl mx-auto">
-                <div className="input-bar-glass rounded-2xl p-1.5">
-                  <div className="flex items-end gap-2">
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowUploadMenu(!showUploadMenu)}
-                        className={`p-3 rounded-xl transition-all duration-200
-                          ${isUploading ? 'text-white/60' : 'text-white/25 hover:text-white/50 hover:bg-white/[0.06]'}`}
-                        disabled={isUploading}
-                      >
-                        {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Paperclip size={18} />}
-                      </button>
-                      <AnimatePresence>
-                        {showUploadMenu && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                            className="absolute bottom-full left-0 mb-2 upload-dropdown rounded-xl p-1.5 min-w-[180px]"
-                          >
-                            {[
-                              { key: 'pdf', label: 'Incident Report', sub: 'PDF files', icon: FileText },
-                              { key: 'scene_image', label: 'Scene Photo', sub: 'Images', icon: Image },
-                              { key: 'evidence_image', label: 'Evidence Photo', sub: 'Images', icon: Image },
-                            ].map(({ key, label, sub, icon: Icon }) => (
-                              <button
-                                key={key}
-                                onClick={() => { setUploadType(key as any); setShowUploadMenu(false); openFilePicker(); }}
-                                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                                  text-white/50 hover:text-white/80 hover:bg-white/[0.06]
-                                  transition-all duration-200 text-left"
-                              >
-                                <Icon size={15} className="text-white/30" />
-                                <div>
-                                  <p className="text-[12px] font-medium">{label}</p>
-                                  <p className="text-[10px] text-white/25">{sub}</p>
-                                </div>
-                              </button>
-                            ))}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+              {/* Uploaded files pills */}
+              {uploadedFiles.length > 0 && (
+                <div className="px-4 relative z-20">
+                  <div className="max-w-3xl mx-auto">
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {uploadedFiles.map((f) => (
+                        <motion.div
+                          key={f.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-[12px]
+                            chat-msg-ai"
+                        >
+                          {f.status === 'uploading' ? (
+                            <Loader2 size={12} className="animate-spin text-cyan-400/60" />
+                          ) : f.status === 'done' ? (
+                            <CheckCircle2 size={12} className="text-emerald-400/70" />
+                          ) : (
+                            <X size={12} className="text-red-400/70" />
+                          )}
+                          {f.type === 'pdf' ? <FileText size={12} className="text-white/30" /> : <Image size={12} className="text-white/30" />}
+                          <span className="text-white/50 max-w-[150px] truncate">{f.name}</span>
+                          {f.status === 'done' && <span className="text-white/20 text-[10px] font-mono">{f.chunks} chunks</span>}
+                          <button onClick={() => removeUploadedFile(f.id)} className="text-white/20 hover:text-white/50 transition-colors ml-1">
+                            <X size={11} />
+                          </button>
+                        </motion.div>
+                      ))}
                     </div>
-                    <textarea
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={handleKeyDown}
-                      placeholder={isHypothesisChat ? "Describe the incident or ask about a hypothesis..." : "Ask about the evidence..."}
-                      rows={1}
-                      className="flex-1 bg-transparent text-[14px] text-white/90 placeholder-white/20
-                        resize-none focus:outline-none py-3 leading-relaxed"
-                      style={{ minHeight: '48px', maxHeight: '150px' }}
-                    />
-                    <button
-                      onClick={handleSend}
-                      disabled={!input.trim() || isLoading}
-                      className="send-btn p-3 rounded-xl transition-all duration-200 active:scale-90
-                        disabled:opacity-20 disabled:cursor-not-allowed"
-                    >
-                      <Send size={17} />
-                    </button>
                   </div>
                 </div>
-              </div>
-            </div>
+              )}
+
+              {/* PromptInputBox — only show when messages exist (not empty state) */}
+              {!isChatEmpty && (
+                <div className="pb-4 sm:pb-6 px-3 sm:px-4 relative z-20">
+                  <div className="max-w-3xl mx-auto">
+                    <PromptInputBoxDynamic
+                      onSend={handlePromptSend}
+                      isLoading={isLoading || isGeneratingPdf}
+                      placeholder={isHypothesisChat ? "Describe the incident or ask about a hypothesis..." : "Ask about the evidence..."}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -1154,6 +1561,71 @@ export default function Home() {
             >
               <Zap size={40} className="text-black/80" />
               <span>Activating Investigator Mode</span>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* About Modal */}
+      <AnimatePresence>
+        {showAbout && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowAbout(false)} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[#1a1a1e] text-white shadow-2xl overflow-hidden"
+            >
+              <div className="p-6 sm:p-8">
+                <button
+                  onClick={() => setShowAbout(false)}
+                  className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                >
+                  <X size={18} className="text-white/50" />
+                </button>
+
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                    <Fingerprint size={22} className="text-emerald-400" />
+                  </div>
+                  <h2 className="text-xl font-bold tracking-tight">Evidence.AI</h2>
+                </div>
+
+                <div className="space-y-3 text-[14px] leading-relaxed text-white/70">
+                  <p>
+                    <strong className="text-white/90">Evidence.AI</strong> is an AI-powered forensic analysis platform that combines
+                    Retrieval-Augmented Generation (RAG) with multimodal intelligence to assist in criminal investigation workflows.
+                  </p>
+                  <p>
+                    Upload crime scene images, forensic PDFs, and evidence documents — the AI analyzes, cross-references,
+                    and generates detailed forensic reports. Features include intelligent case isolation, timeline reconstruction,
+                    hypothesis generation using ACH methodology, and a specialized forensic chatbot.
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-5 border-t border-white/10">
+                  <h3 className="text-sm font-semibold text-white/90 mb-3">Connect with Madhav</h3>
+                  <div className="space-y-2 text-[13px]">
+                    <div className="flex items-center gap-3 text-white/60">
+                      <span className="text-white/30">📞</span>
+                      <span>9813569096</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/60">
+                      <span className="text-white/30">📧</span>
+                      <a href="mailto:madhavkalra2005@gmail.com" className="hover:text-emerald-400 transition-colors">
+                        madhavkalra2005@gmail.com
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
