@@ -52,12 +52,15 @@ from config import (
     ENABLE_TIMELINE,
     ENABLE_HYPOTHESIS,
     ENABLE_CASE_MEMORY,
+    USE_HYBRID_RETRIEVAL,
     GROQ_API_KEY,
     GROQ_MODEL
 )
 from rag.pdf_loader import load_pdf
 from rag.chunking import chunk_documents
 from rag.vector_store import vector_store
+from rag.bm25_engine import bm25_engine
+from rag.hybrid_retriever import retrieve_hybrid
 from rag.image_processor import process_image
 from rag.llm_engine import generate_answer
 from groq import Groq
@@ -299,6 +302,11 @@ async def upload_pdf(
     # Step 4 & 5: Embed and store in ChromaDB (case-specific collection)
     added = vector_store.add_documents(chunks, case_id=case_id)
 
+    # Step 6: Sync chunks to BM25 index (for hybrid retrieval)
+    if USE_HYBRID_RETRIEVAL:
+        bm25_engine.add_documents(chunks, case_id=case_id)
+        print(f"[API] BM25 index synced with {len(chunks)} chunks for case '{case_id}'")
+
     return {
         "message": f"PDF processed successfully",
         "filename": file.filename,
@@ -374,6 +382,11 @@ async def upload_image(
 
     # Step 4 & 5: Embed and store in ChromaDB (case-specific collection)
     added = vector_store.add_documents(chunks, case_id=case_id)
+
+    # Step 6: Sync chunks to BM25 index (for hybrid retrieval)
+    if USE_HYBRID_RETRIEVAL:
+        bm25_engine.add_documents(chunks, case_id=case_id)
+        print(f"[API] BM25 index synced with {len(chunks)} chunks for case '{case_id}'")
 
     return {
         "message": "Image processed successfully",
@@ -587,10 +600,15 @@ async def chat(request: ChatRequest):
     # ══════════════════════════════════════════════════════
     # STEP 1: RETRIEVE relevant context (CASE-ISOLATED)
     # ══════════════════════════════════════════════════════
-    # The search() method now takes case_id and only searches
-    # within that case's ChromaDB collection.
-    # HYDE and Parent-Child are handled internally.
-    context_chunks = vector_store.search(question, case_id=active_case)
+    # If USE_HYBRID_RETRIEVAL is True, we combine vector search
+    # (semantic) with BM25 (keyword) for better recall.
+    # Otherwise, we use vector search only (original behavior).
+    if USE_HYBRID_RETRIEVAL:
+        context_chunks = retrieve_hybrid(question, case_id=active_case)
+        print(f"[API] Hybrid retrieval returned {len(context_chunks)} chunks")
+    else:
+        context_chunks = vector_store.search(question, case_id=active_case)
+        print(f"[API] Vector-only retrieval returned {len(context_chunks)} chunks")
 
     # ══════════════════════════════════════════════════════
     # STEP 2: GENERATE answer with RAG context
@@ -610,6 +628,27 @@ async def chat(request: ChatRequest):
             hyde_used=USE_HYDE,
             jailbreak_blocked=False
         )
+
+    # ══════════════════════════════════════════════════════
+    # STEP 4: AUTO-EVALUATE retrieval (Precision/Recall/MRR)
+    # ══════════════════════════════════════════════════════
+    # This computes Precision, Recall, and MRR on every chat
+    # query using answer-based relevance (no ground truth needed).
+    from rag.retrieval_evaluator import auto_evaluate_retrieval
+    try:
+        retrieval_metrics = auto_evaluate_retrieval(
+            query=question,
+            answer=result["answer"],
+            retrieved_chunks=result["context_used"],
+            case_id=active_case
+        )
+    except Exception as metrics_err:
+        print(f"[METRICS ERROR] {metrics_err}")
+        retrieval_metrics = {
+            "precision": 0, "recall": 0, "mrr": 0,
+            "relevant_retrieved": 0, "total_retrieved": 0,
+            "first_relevant_rank": 0,
+        }
 
     return {
         "answer": result["answer"],
@@ -635,7 +674,15 @@ async def chat(request: ChatRequest):
         "evaluation": {
             "retrieval_relevance": eval_metrics["retrieval_relevance"],
             "grounding_score": eval_metrics["grounding_score"],
-        } if eval_metrics else None
+        } if eval_metrics else None,
+        "retrieval_metrics": {
+            "precision": retrieval_metrics["precision"],
+            "recall": retrieval_metrics["recall"],
+            "mrr": retrieval_metrics["mrr"],
+            "relevant_retrieved": retrieval_metrics["relevant_retrieved"],
+            "total_retrieved": retrieval_metrics["total_retrieved"],
+            "first_relevant_rank": retrieval_metrics["first_relevant_rank"],
+        }
     }
 
 
@@ -653,6 +700,11 @@ async def reset():
     """
     # Clear all ChromaDB collections
     vector_store.clear()
+
+    # Clear BM25 indices (hybrid retrieval)
+    if USE_HYBRID_RETRIEVAL:
+        bm25_engine.clear()
+        print("[API] BM25 indices cleared")
 
     # Clear case registry + session state
     clear_all_cases()
@@ -672,7 +724,95 @@ async def reset():
     if ENABLE_CASE_MEMORY:
         clear_case_memory()
 
+    # Clear retrieval metrics log (hybrid retrieval evaluation)
+    from config import RETRIEVAL_METRICS_LOG
+    if os.path.exists(RETRIEVAL_METRICS_LOG):
+        os.remove(RETRIEVAL_METRICS_LOG)
+        print("[API] Retrieval metrics log cleared")
+
     return {"message": "All data cleared", "total_chunks": 0}
+
+
+# ============================================================
+# RETRIEVAL EVALUATION ENDPOINT
+# ============================================================
+# This endpoint allows ACADEMIC evaluation of retrieval quality.
+# You provide a query + ground truth chunks, and it runs hybrid
+# retrieval then computes Precision, Recall, and MRR.
+#
+# Example usage:
+#   POST /api/evaluate
+#   {
+#     "query": "Was a knife found at the scene?",
+#     "ground_truth": [
+#       "The knife was recovered near the kitchen sink",
+#       "A sharp object, later identified as a knife, was found"
+#     ],
+#     "case_id": "case_FR-2024-001",
+#     "top_k": 5
+#   }
+# ============================================================
+
+class EvaluationRequest(BaseModel):
+    query: str
+    ground_truth: list  # List of ground truth chunk texts (strings)
+    case_id: str = "default"
+    top_k: int = 5
+
+
+@app.post("/api/evaluate")
+async def evaluate_retrieval(request: EvaluationRequest):
+    """
+    Evaluate retrieval quality by comparing retrieved chunks
+    against user-provided ground truth.
+
+    Returns Precision, Recall, and MRR metrics.
+
+    This endpoint is designed for academic evaluation and
+    A/B testing of different retrieval configurations.
+    """
+    from rag.retrieval_evaluator import evaluate_query, get_metrics_history
+
+    # Run hybrid retrieval (or vector-only if hybrid is disabled)
+    if USE_HYBRID_RETRIEVAL:
+        retrieved_chunks = retrieve_hybrid(
+            request.query, case_id=request.case_id, top_k=request.top_k
+        )
+    else:
+        retrieved_chunks = vector_store.search(
+            request.query, case_id=request.case_id, top_k=request.top_k
+        )
+
+    # Evaluate retrieval quality against ground truth
+    metrics = evaluate_query(
+        query=request.query,
+        retrieved_chunks=retrieved_chunks,
+        ground_truth_chunks=request.ground_truth
+    )
+
+    return {
+        "metrics": metrics,
+        "retrieved_count": len(retrieved_chunks),
+        "ground_truth_count": len(request.ground_truth),
+        "retrieval_method": "hybrid" if USE_HYBRID_RETRIEVAL else "vector_only"
+    }
+
+
+@app.get("/api/evaluate/history")
+async def get_evaluation_history():
+    """
+    Return all historical retrieval evaluation metrics.
+
+    This enables trend analysis: are retrieval metrics improving
+    or degrading over time?
+    """
+    from rag.retrieval_evaluator import get_metrics_history
+
+    history = get_metrics_history()
+    return {
+        "evaluations": history,
+        "total_evaluations": len(history)
+    }
 
 
 # ============================================================

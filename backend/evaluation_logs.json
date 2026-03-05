@@ -478,5 +478,643 @@
         "page": 0
       }
     ]
+  },
+  {
+    "timestamp": "2026-03-05T13:39:16.701595",
+    "question": "summarize this report",
+    "answer_preview": "**Incident Summary**\n\nThe incident in question appears to be a burglary involving forced entry through the living room window at 221B West Ridge Apartments, Sector 9, as reported by Mr. Rohan Malhotra. According to the incident report [Source 2], the break-in occurred on February 14, 2026, at approx...",
+    "answer_length": 1987,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.5121,
+    "grounding_score": 0.8824,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.054142951965332,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.9557700177649217,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.062730312347412,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T13:39:31.030117",
+    "question": "short this in 4 lines",
+    "answer_preview": "A break-in occurred at 221B West Ridge Apartments, according to the incident report [Source 4]. The living room window was forced open, and a kitchen knife was found on the floor, as noted in [Source 3]. Glass fragments were mostly found inside the room, with no blood stains or signs of struggle, as...",
+    "answer_length": 496,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.7493,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.105014443397522,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 1.1841847643393473,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.8861341392259703,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.3201735019683838,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T14:44:56.661824",
+    "question": "what weapon was found?",
+    "answer_preview": "According to the reports from multiple sources, including [Source 2], [Source 3], and [Source 4], a kitchen knife was found on the floor, approximately 1.5 meters from the sofa. It's noted that this knife did not belong to the homeowner, as stated by the complainant. The presence of this knife is co...",
+    "answer_length": 563,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.8176,
+    "grounding_score": 0.6,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.0619786977767944,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 1.7154644296569495,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.8994862350891563,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.2287826538085938,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T15:22:11.582581",
+    "question": "Was there any sign of struggle?",
+    "answer_preview": "According to the preliminary report [Source 1], no immediate signs of struggle were observed at the scene. This is further supported by [Source 2] and [Source 3], which describe the living room as being in partial disarray, with a wooden coffee table overturned, but do not mention any signs of a str...",
+    "answer_length": 605,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 4,
+    "retrieval_relevance": 0.6584,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.7266273498535156,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.6221699706635374,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.7950540781021118,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.48983703378703886,
+        "type": "pdf",
+        "page": 1
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T15:26:17.213438",
+    "question": "How did the intruder enter?",
+    "answer_preview": "The intruder entered through the living room window, which showed signs of forced entry. According to [Source 2] and [Source 5], the window latch appeared broken from external force, and glass fragments were found inside the living room near the window frame. This is further supported by [Source 4],...",
+    "answer_length": 797,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.6316,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.88172447681427,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 1.3037555655961346,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.3509554965205796,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.34411356800588716,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.9091023802757263,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T15:32:33.744952",
+    "question": "summarize the whole reporgt",
+    "answer_preview": "Based on the information provided, the incident appears to be a burglary involving forced entry through the living room window at 221B West Ridge Apartments, Sector 9. According to [Source 1] and [Source 5], the window latch was broken from external force, and glass fragments were found inside the l...",
+    "answer_length": 1616,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.4206,
+    "grounding_score": 0.6923,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.5900293588638306,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.4176214263701642,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.3509554965205796,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.34411356800588716,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.8207105994224548,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T15:35:47.090655",
+    "question": "What evidence was collected?",
+    "answer_preview": "The evidence collected from the scene includes a broken window latch, glass fragments, a kitchen knife, a shoe print photograph, and fingerprints lifted from the window frame. According to [Source 2] and [Source 4], these items were found near the broken window and inside the living room. The glass ...",
+    "answer_length": 1087,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.8137,
+    "grounding_score": 0.8889,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.7552136182785034,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 2.731050066972213,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.5516433378262519,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.8442160487174988,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T15:37:03.364831",
+    "question": "What evidence was collected?",
+    "answer_preview": "According to the incident report [Source 1], several pieces of evidence were collected from the scene. These include a broken window latch, glass fragments that were found inside the living room near the window frame, a kitchen knife that was discovered on the floor approximately 1.5 meters from the...",
+    "answer_length": 1314,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.8561,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.8656649589538574,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 2.731050066972213,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.5516433378262519,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.9881092309951782,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T15:37:59.796343",
+    "question": "Where was the knife found?",
+    "answer_preview": "According to [Source 2: pdf, Page 1] and [Source 5: pdf, Page 1], the kitchen knife was found on the floor approximately 1.5 meters from the sofa in the living room. This information is consistent across both sources, suggesting that they relate to the same case. The fact that the knife did not belo...",
+    "answer_length": 711,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.7446,
+    "grounding_score": 0.6667,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.6862044334411621,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 1.4871815336416894,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.9314990456360785,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.34411356800588716,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.0188987255096436,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T15:39:00.213063",
+    "question": "How did the intruder enter?",
+    "answer_preview": "The intruder entered through the living room window, which showed signs of forced entry. According to the report on Page 1 of Source 2, the window latch appeared broken from external force, and glass fragments were found inside the living room near the window frame. This is further supported by Sour...",
+    "answer_length": 1212,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.5915,
+    "grounding_score": 0.75,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.7723487615585327,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 1.3037555655961346,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.3509554965205796,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.34411356800588716,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.7775501608848572,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T16:08:01.828215",
+    "question": "What evidence was collected?",
+    "answer_preview": "The evidence collected from the scene includes a broken window latch, glass fragments, a kitchen knife, a shoe print photograph, and fingerprints lifted from the window frame. According to [Source 2] and [Source 4], these items were found near the broken window and inside the living room. The kitche...",
+    "answer_length": 1100,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.8169,
+    "grounding_score": 0.8571,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.7634440064430237,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 2.731050066972213,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.5516433378262519,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.8551974892616272,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T16:08:24.679478",
+    "question": "Where was the knife found?",
+    "answer_preview": "The knife was found on the floor, approximately 1.5 meters from the sofa, in the living room. This is according to the descriptions provided in both Source 2 and Source 5, which appear to be from the same case, given the matching details about the living room's condition, the broken window, and the ...",
+    "answer_length": 455,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.7371,
+    "grounding_score": 1.0,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.6485934257507324,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 1.4871815336416894,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.9314990456360785,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.34411356800588716,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.0114352703094482,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-05T16:09:10.456652",
+    "question": "How did the intruder enter?",
+    "answer_preview": "The intruder entered through the living room window, which showed signs of forced entry. According to [Source 2] and [Source 5], the window latch appeared broken from external force, and glass fragments were found inside the living room near the window frame. This is further supported by [Source 4],...",
+    "answer_length": 1141,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.6283,
+    "grounding_score": 0.75,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.8670527935028076,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 1.3037555655961346,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.3509554965205796,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.34411356800588716,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.9038477540016174,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
   }
 ]
