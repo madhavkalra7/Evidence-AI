@@ -376,8 +376,8 @@ export default function Home() {
     setUploadedFiles([]);
     setSceneAnalyses({});
     setAnalyzingFiles({});
-    // Random gradient on every new chat
-    setGradientTheme(getRandomGradient());
+    // Default to detective theme (bg image), user can change after
+    setGradientTheme('detective');
     createChat();
   };
 

@@ -43,10 +43,10 @@
 # HOW IS THIS USED IN RAG?
 # ─────────────────────────
 #   1. When user uploads a document:
-#      Each chunk → embedding → stored in FAISS
+#      Each chunk → embedding → stored in Chroma DB
 #
 #   2. When user asks a question:
-#      Question → embedding → search FAISS for nearest vectors
+#      Question → embedding → search Chroma DB for nearest vectors
 #      → nearest vectors = most relevant chunks
 #
 #   This is called SEMANTIC SEARCH (search by meaning, not keywords).

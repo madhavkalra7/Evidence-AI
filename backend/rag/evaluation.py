@@ -169,6 +169,7 @@ import os
 import re
 from datetime import datetime
 from typing import List, Dict, Optional
+from rag.llm_judge import evaluate_with_llm_judge
 
 
 # ─────────────────────────────────────────────────────────
@@ -395,6 +396,18 @@ def log_evaluation(
     retrieval_relevance = compute_retrieval_relevance(retrieved_chunks)
     grounding_score = compute_context_overlap(answer, retrieved_chunks)
 
+    # ── LLM-as-a-Judge evaluation ──
+    llm_judge_result = None
+    if not jailbreak_blocked:
+        try:
+            llm_judge_result = evaluate_with_llm_judge(
+                question=question,
+                answer=answer,
+                retrieved_chunks=retrieved_chunks
+            )
+        except Exception as judge_err:
+            print(f"[EVALUATION] LLM Judge failed (non-blocking): {judge_err}")
+
     # ── Build log entry ──
     log_entry = {
         "timestamp": datetime.now().isoformat(),
@@ -407,6 +420,16 @@ def log_evaluation(
         "grounding_score": grounding_score,
         "hyde_used": hyde_used,
         "jailbreak_blocked": jailbreak_blocked,
+        "llm_judge": {
+            "faithfulness": llm_judge_result["faithfulness"] if llm_judge_result else {"score": 0, "reason": "N/A"},
+            "correctness": llm_judge_result["correctness"] if llm_judge_result else {"score": 0, "reason": "N/A"},
+            "completeness": llm_judge_result["completeness"] if llm_judge_result else {"score": 0, "reason": "N/A"},
+            "hallucination": llm_judge_result["hallucination"] if llm_judge_result else {"score": 0, "reason": "N/A"},
+            "overall_quality": llm_judge_result.get("overall_quality", "unknown") if llm_judge_result else "unknown",
+            "summary": llm_judge_result.get("summary", "") if llm_judge_result else "",
+            "judge_model": llm_judge_result.get("judge_model", "") if llm_judge_result else "",
+            "judge_latency_ms": llm_judge_result.get("judge_latency_ms", 0) if llm_judge_result else 0,
+        },
         "retrieved_chunks_preview": [
             {
                 "text_preview": chunk.get("text", "")[:150],
@@ -427,6 +450,13 @@ def log_evaluation(
           f"({'good' if retrieval_relevance < 0.5 else 'fair' if retrieval_relevance < 1.0 else 'poor'})")
     print(f"  Grounding score: {grounding_score:.1%} "
           f"({'strong' if grounding_score > 0.7 else 'moderate' if grounding_score > 0.4 else 'weak'})")
+    if llm_judge_result:
+        print(f"  ── LLM Judge ──")
+        print(f"  Faithfulness  : {llm_judge_result['faithfulness'].get('score', '?')}/5")
+        print(f"  Correctness   : {llm_judge_result['correctness'].get('score', '?')}/5")
+        print(f"  Completeness  : {llm_judge_result['completeness'].get('score', '?')}/5")
+        print(f"  Hallucination : {llm_judge_result['hallucination'].get('score', '?')}/5 (5=none)")
+        print(f"  Overall       : {llm_judge_result.get('overall_quality', '?')}")
     print(f"  HYDE used: {hyde_used}")
     print(f"  Jailbreak blocked: {jailbreak_blocked}")
     print(f"[EVALUATION] ═══════════════════════════════════════\n")
@@ -536,6 +566,18 @@ def get_evaluation_summary() -> Dict:
     moderate = sum(1 for g in grounding_scores if 0.4 < g <= 0.7)
     weak = sum(1 for g in grounding_scores if g <= 0.4)
 
+    # ── LLM Judge aggregate metrics ──
+    judge_entries = [l.get("llm_judge") for l in logs if l.get("llm_judge")]
+    faithfulness_scores = [j["faithfulness"]["score"] for j in judge_entries if j.get("faithfulness", {}).get("score", 0) > 0]
+    correctness_scores = [j["correctness"]["score"] for j in judge_entries if j.get("correctness", {}).get("score", 0) > 0]
+    completeness_scores = [j["completeness"]["score"] for j in judge_entries if j.get("completeness", {}).get("score", 0) > 0]
+    hallucination_scores = [j["hallucination"]["score"] for j in judge_entries if j.get("hallucination", {}).get("score", 0) > 0]
+
+    quality_counts = {}
+    for j in judge_entries:
+        q = j.get("overall_quality", "unknown")
+        quality_counts[q] = quality_counts.get(q, 0) + 1
+
     return {
         "total_queries": total,
         "avg_retrieval_relevance": round(sum(relevance_scores) / total, 4),
@@ -547,6 +589,14 @@ def get_evaluation_summary() -> Dict:
             "strong_grounding": strong,
             "moderate_grounding": moderate,
             "weak_grounding": weak
+        },
+        "llm_judge_summary": {
+            "total_judged": len(judge_entries),
+            "avg_faithfulness": round(sum(faithfulness_scores) / len(faithfulness_scores), 2) if faithfulness_scores else 0,
+            "avg_correctness": round(sum(correctness_scores) / len(correctness_scores), 2) if correctness_scores else 0,
+            "avg_completeness": round(sum(completeness_scores) / len(completeness_scores), 2) if completeness_scores else 0,
+            "avg_hallucination": round(sum(hallucination_scores) / len(hallucination_scores), 2) if hallucination_scores else 0,
+            "quality_distribution": quality_counts
         },
         "latest_query": logs[-1].get("timestamp", "unknown") if logs else "none"
     }

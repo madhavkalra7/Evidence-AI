@@ -238,29 +238,39 @@ def auto_evaluate_retrieval(
     case_id: str = "default"
 ) -> Dict:
     """
-    Auto-evaluate retrieval quality using SEMANTIC SIMILARITY
-    between the user's query and each retrieved chunk.
+    Auto-evaluate retrieval quality using DUAL SEMANTIC SIMILARITY:
+    query-to-chunk AND answer-to-chunk comparison.
 
     Runs on EVERY chat query — no manual ground truth needed.
 
-    SEMANTIC EVALUATION STRATEGY:
-    ──────────────────────────────
+    DUAL EVALUATION STRATEGY:
+    ──────────────────────────
     1. Embed the user's query → 384-dim vector
-    2. Embed each retrieved chunk → 384-dim vector
-    3. Compute cosine similarity between query and each chunk
-    4. If similarity > SIMILARITY_THRESHOLD (0.35) → chunk is relevant
+    2. Embed the LLM's answer → 384-dim vector
+    3. Embed each retrieved chunk → 384-dim vector
+    4. Compute TWO similarities per chunk:
+       a) query_sim  = cosine(query, chunk)
+       b) answer_sim = cosine(answer, chunk)
+    5. Take MAX(query_sim, answer_sim) as the final relevance score
+    6. If max_sim > SIMILARITY_THRESHOLD → chunk is relevant
 
-    WHY THIS WORKS:
-    ────────────────
-    Unlike keyword matching, semantic similarity catches cases like:
-      Query: "How did the intruder enter?"
-      Chunk: "forced entry through the living room window"
-      → cosine_similarity = 0.72 → RELEVANT ✓
+    WHY DUAL COMPARISON?
+    ─────────────────────
+    For SPECIFIC queries like "What weapon was found?", query-to-chunk
+    similarity works well because the query contains forensic keywords.
 
-    Keyword matching would give 0% overlap → NOT relevant ✗
+    But for BROAD queries like "summarize this report", the query is a
+    META-INSTRUCTION — it has ZERO content words. Cosine similarity
+    between "summarize this report" and a forensic chunk is ~0.05-0.20
+    (virtually no semantic overlap), causing Precision/Recall/MRR = 0.
 
-    The embedding model (all-MiniLM-L6-v2) understands that
-    "intruder enter" and "forced entry" mean the same thing.
+    However, the LLM's ANSWER contains actual forensic content extracted
+    FROM those chunks. answer-to-chunk similarity is high (~0.5-0.8)
+    because the answer paraphrases the chunks.
+
+    By taking MAX(query_sim, answer_sim), we handle both cases:
+      - Specific queries: query_sim is high → works via query path
+      - Broad queries: answer_sim is high → works via answer path
     """
     total_retrieved = len(retrieved_chunks)
     if total_retrieved == 0:
@@ -272,25 +282,29 @@ def auto_evaluate_retrieval(
         _print_metrics(empty_result)
         return empty_result
 
-    # ── Step 1: Embed the query once ──
+    # ── Step 1: Embed query and answer ──
     query_embedding = embed_text(query)[0]
+    answer_embedding = embed_text(answer[:1500])[0] if answer else query_embedding
 
     # ── Step 2: Embed all chunk texts in one batch (efficient) ──
     chunk_texts = [c.get("text", "") for c in retrieved_chunks]
     chunk_embeddings = embed_text(chunk_texts)
 
-    # ── Step 3: Compute cosine similarity for each chunk ──
+    # ── Step 3: Compute DUAL similarity for each chunk ──
     relevant_retrieved = 0
     first_relevant_rank = 0
 
-    print("\n[EVALUATOR] Chunk-by-chunk semantic similarity:")
+    print("\n[EVALUATOR] Chunk-by-chunk semantic similarity (query | answer | max):")
     for i, chunk in enumerate(retrieved_chunks):
-        sim = compute_similarity(query_embedding, chunk_embeddings[i])
-        is_relevant = sim >= SIMILARITY_THRESHOLD
+        query_sim = compute_similarity(query_embedding, chunk_embeddings[i])
+        answer_sim = compute_similarity(answer_embedding, chunk_embeddings[i])
+        max_sim = max(query_sim, answer_sim)
+        is_relevant = max_sim >= SIMILARITY_THRESHOLD
 
         # Per-chunk similarity log for debugging
-        status = "relevant" if is_relevant else "not relevant"
-        print(f"  Chunk {i+1} similarity: {sim:.2f} → {status}")
+        status = "RELEVANT" if is_relevant else "not relevant"
+        used = "query" if query_sim >= answer_sim else "answer"
+        print(f"  Chunk {i+1}: query={query_sim:.2f} | answer={answer_sim:.2f} | max={max_sim:.2f} ({used}) → {status}")
 
         if is_relevant:
             relevant_retrieved += 1

@@ -1488,5 +1488,215 @@
         "page": 0
       }
     ]
+  },
+  {
+    "timestamp": "2026-03-09T13:11:37.102278",
+    "question": "summarize this report",
+    "answer_preview": "**Incident Summary**\n\nThe incident in question appears to be a burglary involving forced entry through the living room window at 221B West Ridge Apartments, Sector 9, as reported by Mr. Rohan Malhotra. According to the incident report [Source 2], the break-in occurred on February 14, 2026, at approx...",
+    "answer_length": 1987,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.5098,
+    "grounding_score": 0.8125,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "llm_judge": {
+      "faithfulness": {
+        "score": 5,
+        "reason": "Every claim in the answer is directly supported by the provided context chunks"
+      },
+      "correctness": {
+        "score": 5,
+        "reason": "The answer accurately and directly addresses the user's question, providing a clear summary of the incident report"
+      },
+      "completeness": {
+        "score": 5,
+        "reason": "The answer covers all important details from the context that are relevant to the question, including the incident overview, scene description, evidence collected, and preliminary observations"
+      },
+      "hallucination": {
+        "score": 5,
+        "reason": "There is zero fabrication in the answer, with all information being directly taken from the context chunks"
+      },
+      "overall_quality": "excellent",
+      "summary": "The AI assistant's answer is of high quality, providing a comprehensive and accurate summary of the incident report, with all claims supported by the context chunks.",
+      "judge_model": "llama-3.3-70b-versatile",
+      "judge_latency_ms": 646
+    },
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.9697411060333252,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.9557700177649217,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.1332260370254517,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-09T13:18:37.527234",
+    "question": "summarize this report",
+    "answer_preview": "**Incident Summary**\n\nThe incident in question appears to be a burglary involving forced entry through the living room window at 221B West Ridge Apartments, Sector 9, as reported by Mr. Rohan Malhotra. According to the incident report [Source 2], local authorities responded to the break-in at approx...",
+    "answer_length": 2139,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 6,
+    "retrieval_relevance": 0.4911,
+    "grounding_score": 0.8824,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "llm_judge": {
+      "faithfulness": {
+        "score": 4,
+        "reason": "Most claims are supported by the context, but some minor details like the comparison of sources and the conclusion sentence about further forensic analysis are slightly inferred"
+      },
+      "correctness": {
+        "score": 5,
+        "reason": "The answer accurately and directly addresses the user's question, providing a clear summary of the incident"
+      },
+      "completeness": {
+        "score": 4,
+        "reason": "The answer covers most important details from the context, but misses some minor points like the case ID and the reporting officer's name"
+      },
+      "hallucination": {
+        "score": 4,
+        "reason": "There is minor fabrication, such as the introduction of 'Source 1', 'Source 2', etc., which are not present in the original context, but the overall content is based on the provided context"
+      },
+      "overall_quality": "good",
+      "summary": "The AI assistant's answer provides a clear and accurate summary of the incident, covering most important details from the context, but with some minor inferred details and fabrication.",
+      "judge_model": "llama-3.3-70b-versatile",
+      "judge_latency_ms": 935
+    },
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 0.8513721227645874,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.064659368993363,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.0305712223052979,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "ins under investigation.",
+        "score": 0.0,
+        "type": "pdf",
+        "page": 2
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-03-09T13:24:50.386431",
+    "question": "which weapon was found at that scene?",
+    "answer_preview": "According to the reports, a kitchen knife was found at the scene. This is mentioned in multiple sources, including [Source 2], [Source 3], and [Source 4], which all describe the knife as a possible weapon. [Source 2] and [Source 4] also list the kitchen knife as part of the evidence collected, along...",
+    "answer_length": 801,
+    "model": "llama-3.3-70b-versatile",
+    "top_k_used": 5,
+    "retrieval_relevance": 1.2076,
+    "grounding_score": 0.5,
+    "hyde_used": true,
+    "jailbreak_blocked": false,
+    "llm_judge": {
+      "faithfulness": {
+        "score": 5,
+        "reason": "Every claim in the answer is directly supported by the provided context chunks, which consistently mention a kitchen knife found at the scene."
+      },
+      "correctness": {
+        "score": 5,
+        "reason": "The answer accurately and directly addresses the user's question about the weapon found at the scene, correctly identifying it as a kitchen knife."
+      },
+      "completeness": {
+        "score": 4,
+        "reason": "The answer covers the main points about the kitchen knife from the context but could include more details, such as its location or the implications of it not belonging to the homeowner."
+      },
+      "hallucination": {
+        "score": 5,
+        "reason": "There is no fabricated information in the answer; everything is directly from the context chunks provided."
+      },
+      "overall_quality": "excellent",
+      "summary": "The answer is of high quality, accurately and faithfully addressing the user's question with information directly from the context, with minimal room for improvement in terms of completeness.",
+      "judge_model": "llama-3.3-70b-versatile",
+      "judge_latency_ms": 964
+    },
+    "retrieved_chunks_preview": [
+      {
+        "text_preview": "However: \n Glass fragments were mostly found inside the room. \n No blood stains were detected at the scene. \n No immediate signs of struggle were o",
+        "score": 1.2599374055862427,
+        "type": "pdf",
+        "page": 2
+      },
+      {
+        "text_preview": "ng to the complainant. \nA muddy shoe print was observed near the broken window. \n \n3. Evidence Collected \n Broken window latch \n Glass fragments (ba",
+        "score": 1.7154644296569495,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "try through the living room window. \nThe window latch appeared broken from external force. Glass fragments were located \ninside the living room near t",
+        "score": 1.1960908560910313,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 1.3916187286376953,
+        "type": "pdf",
+        "page": 1
+      },
+      {
+        "text_preview": "INCIDENT REPORT \nCase ID: FR-017-2026 \nDate: 14 February 2026 \nLocation: 221B West Ridge Apartments, Sector 9 \nReporting OƯicer: Inspector A. Mehra \n ",
+        "score": 0.47465122955758754,
+        "type": "pdf",
+        "page": 1
+      }
+    ]
   }
 ]

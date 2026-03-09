@@ -674,6 +674,7 @@ async def chat(request: ChatRequest):
         "evaluation": {
             "retrieval_relevance": eval_metrics["retrieval_relevance"],
             "grounding_score": eval_metrics["grounding_score"],
+            "llm_judge": eval_metrics.get("llm_judge"),
         } if eval_metrics else None,
         "retrieval_metrics": {
             "precision": retrieval_metrics["precision"],
