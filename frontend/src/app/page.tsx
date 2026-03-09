@@ -990,6 +990,13 @@ export default function Home() {
         ) : (
           /* ── CHAT STATE — Xrio-style Gradient Chat UI ── */
           <>
+            {gradientTheme === 'detective' && (
+              <>
+                <img src="/bg.png" alt="" className="chat-detective-bg" draggable={false} />
+                <div className="chat-detective-vignette" />
+              </>
+            )}
+
             {/* Gradient Background */}
             <div className="chat-gradient-bg" />
 
